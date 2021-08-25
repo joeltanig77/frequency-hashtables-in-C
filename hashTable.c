@@ -3,3 +3,4 @@
 #include <string.h>
 #include "getWord.h"
 #include "crc64.h"
+#include "hashTable.h"

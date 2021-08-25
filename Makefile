@@ -1,7 +1,7 @@
 CPP = gcc
 FLAGS = -Wall -pedantic -g
 
-EXEC = freq
+EXEC = wordPairs
 OBJS = main.o getWord.o hashTable.o
 
 default:${EXEC}
@@ -10,11 +10,14 @@ clean:
 	rm -f ${EXEC}
 	rm -f *.o
 
+bug: ${EXEC}
+	gdb -tui --args ./${EXEC} 44 frankenstein.txt gettysburg.txt
+
 valgrind: ${EXEC}
-	gdb -tui ./${EXEC}
+	valgrind ./${EXEC} 44 frankenstein.txt gettysburg.txt
 
 run: ${EXEC}
-	./${EXEC} test.txt
+	./${EXEC} 44 frankenstein.txt gettysburg.txt
 
 ${EXEC}:${OBJS}
 	${CPP} ${FLAGS} -o ${EXEC} ${OBJS}
