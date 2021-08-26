@@ -8,7 +8,7 @@
 
 // atoi() turns a string into a integer
 
-// 1 = there is a number and 2 = there is no number 3 = not a text file
+// 1 = there is a legal integer and 2 = not a legal integer
 int isThereANumber(char argv[]) {
   int index = 0;
   while(argv[index] != '\0') {
@@ -16,9 +16,10 @@ int isThereANumber(char argv[]) {
       index++;
       continue;
     }
-    // Not a digit there
+    // Not a digit
     return 2;
   }
+  // We found a digit
   return 1;
 
 
@@ -28,19 +29,19 @@ int isThereANumber(char argv[]) {
 
 int main(int argc, char *argv[]) {
    int linesToPrint = 0;
-
    int size = 500;
    struct Node* hashTable = NULL;
    hashTable = (struct Node*)calloc(size,sizeof(struct Node));
-   if (hashTable == NULL) return 1;
+   if (hashTable == NULL){ fprintf(stderr,"Failed to allocate memory"); return 1;}
 
-  int n = 1; // Arg counter that skips the pathway
+  int n = 1; // Arg counter that skips the pathway (pwd)
   if (isThereANumber(argv[1]) == 2) {
-    fprintf(stderr,"Not a number\n");
+    printf("%s\n","Not a number");
+    linesToPrint = -1; // Print Everything
   }
   else {
     n++; // Incrementing counter
-    linesToPrint = atoi(argv[1]); // Turn string into the array
+    linesToPrint = atoi(argv[1]); // Turn string into a integer
     printf("The argument number is %d\n",linesToPrint);
   }
   while (n < argc) {
@@ -52,25 +53,22 @@ int main(int argc, char *argv[]) {
     }
       n++;
 
-
+      // Insert file pointer to insert to hashtable
       takeInPairs(fp,hashTable,size);
 
 
-
       //char *c = getNextWord(fp);
-
       //printf("%s\n",c); //TODO: When I print this, then it leaks
-
       // The string is dynamic!!!!
       //  free(c);
-      // free(hashTable); //This is broken
 
+
+
+      // Close file pointer
       fclose(fp);
   }
 
-
-
-
+   free(hashTable);
 
   return 0;
 }

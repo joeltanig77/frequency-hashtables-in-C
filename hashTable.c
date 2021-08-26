@@ -9,16 +9,19 @@ int takeInPairs(FILE *fp, struct Node *hashTable,int size) {
     int sizeTracker = 0;
     int bucket;
     char wordOneStatic[100];
+    char *wordOne;
+    char *wordTwo;
     while(getNextWord(fp)!= NULL) {
         char wordTwoStatic[100];
-        char *wordOne = getNextWord(fp);
-        char *wordTwo = getNextWord(fp);
+        wordOne = getNextWord(fp);
+        wordTwo = getNextWord(fp);
         strcpy(wordOneStatic,wordOne);
         strcpy(wordTwoStatic,wordTwo);
         printf("%s\n",wordOne);
         printf("%s\n",wordTwo);
+        // Hash the words combine
         strcat(wordOne,wordTwo);
-        // Hash the function
+        // Hash the words
         bucket = crc64(wordOne) % size;
         printf("%d\n",bucket);
         // Need to figure out why -> is not used... and that its only inserting the concat...
@@ -28,7 +31,10 @@ int takeInPairs(FILE *fp, struct Node *hashTable,int size) {
         free(wordOne);
         free(wordTwo);
         sizeTracker++;
+
+        // TODO: Need to do the proper wordTwo = wordOne logic here!!!!!
 }
+
   return 0;
 
 

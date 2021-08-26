@@ -14,7 +14,7 @@ bug: ${EXEC}
 	gdb -tui --args ./${EXEC} 44 frankenstein.txt gettysburg.txt
 
 valgrind: ${EXEC}
-	valgrind ./${EXEC} 44 frankenstein.txt gettysburg.txt
+	valgrind -s --leak-check=full ./${EXEC} 44 frankenstein.txt
 
 run: ${EXEC}
 	./${EXEC} 44 frankenstein.txt gettysburg.txt
