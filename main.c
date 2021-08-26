@@ -30,8 +30,8 @@ int isThereANumber(char argv[]) {
 int main(int argc, char *argv[]) {
    int linesToPrint = 0;
    int size = 500;
-   struct Node* hashTable = NULL;
-   hashTable = (struct Node*)calloc(size,sizeof(struct Node));
+   struct Node** hashTable = NULL;
+   hashTable = (struct Node**)calloc(size,sizeof(struct Node*));
    if (hashTable == NULL){ fprintf(stderr,"Failed to allocate memory"); return 1;}
 
   int n = 1; // Arg counter that skips the pathway (pwd)
