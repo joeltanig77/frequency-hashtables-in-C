@@ -27,12 +27,12 @@ int isThereANumber(char argv[]) {
 }
 
 int main(int argc, char *argv[]) {
-  int linesToPrint = 0;
+   int linesToPrint = 0;
 
-
-   // int size = 500;
-   // struct Node* hashTable = NULL;
-   // hashTable = calloc(size,sizeof(struct Node));
+   int size = 500;
+   struct Node* hashTable = NULL;
+   hashTable = (struct Node*)calloc(size,sizeof(struct Node));
+   if (hashTable == NULL) return 1;
 
   int n = 1; // Arg counter that skips the pathway
   if (isThereANumber(argv[1]) == 2) {
@@ -52,23 +52,22 @@ int main(int argc, char *argv[]) {
     }
       n++;
 
-      char *c = getNextWord(fp);
 
-      printf("%s\n",c); //TODO: When I print this, then it leaks
+      takeInPairs(fp,hashTable,size);
+
+
+
+      //char *c = getNextWord(fp);
+
+      //printf("%s\n",c); //TODO: When I print this, then it leaks
 
       // The string is dynamic!!!!
-      free(c);
-      // for (int i = 0; i < size; i++) {
-      //   free(hashTable[i]);
-      // }
+      //  free(c);
       // free(hashTable); //This is broken
 
       fclose(fp);
   }
 
-
-
-  // Iterate n here
 
 
 

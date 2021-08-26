@@ -4,13 +4,14 @@
 #include <stdio.h>
 
 struct Node {
-  char wordOne[500];
-  char wordTwo[500];
+  char *wordOne;
+  char *wordTwo;
+  char *combined;
   struct Node * prev;
   struct Node * next;
 };
 
-
+int takeInPairs(FILE *fp, struct Node *hashTable,int size);
 
 
 #endif

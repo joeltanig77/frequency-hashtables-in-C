@@ -2,7 +2,7 @@ CPP = gcc
 FLAGS = -Wall -pedantic -g
 
 EXEC = wordPairs
-OBJS = main.o getWord.o hashTable.o
+OBJS = main.o getWord.o hashTable.o crc64.o
 
 default:${EXEC}
 
@@ -26,4 +26,4 @@ ${EXEC}:${OBJS}
 	${CPP} ${FLAGS} -c $<
 
 main.o: main.c crc64.c getWord.h crc64.h
-hashtable.o: getWord.c getWord.h
+hashtable.o: getWord.c crc64.c getWord.h crc64.h
