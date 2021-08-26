@@ -6,33 +6,37 @@
 #include "hashTable.h"
 
 int takeInPairs(FILE *fp, struct Node *hashTable,int size) {
+    char wordOneStatic[100];
+    char wordTwoStatic[100];
+    char combined[100];
     int sizeTracker = 0;
     int bucket;
-    char wordOneStatic[100];
-    char *wordOne;
-    char *wordTwo;
-    while(getNextWord(fp)!= NULL) {
-        char wordTwoStatic[100];
-        wordOne = getNextWord(fp);
-        wordTwo = getNextWord(fp);
-        strcpy(wordOneStatic,wordOne);
+    char *wordOne = getNextWord(fp);
+    strcpy(wordOneStatic,wordOne);
+    strcpy(combined,wordOneStatic);
+    free(wordOne);
+    char *wordTwo = NULL;
+    while((wordTwo = getNextWord(fp))!= NULL) {
         strcpy(wordTwoStatic,wordTwo);
-        printf("%s\n",wordOne);
-        printf("%s\n",wordTwo);
-        // Hash the words combine
-        strcat(wordOne,wordTwo);
-        // Hash the words
-        bucket = crc64(wordOne) % size;
-        printf("%d\n",bucket);
-        // Need to figure out why -> is not used... and that its only inserting the concat...
-        hashTable[bucket].wordOne = wordOneStatic;
-        hashTable[bucket].wordTwo = wordTwoStatic;
-        hashTable[bucket].combined = wordOne;
-        free(wordOne);
-        free(wordTwo);
-        sizeTracker++;
+        strcat(combined,wordTwoStatic);
 
-        // TODO: Need to do the proper wordTwo = wordOne logic here!!!!!
+        bucket = crc64(combined) % size;
+
+
+
+
+        hashTable[bucket].wordOne = wordOneStatic;
+        printf("%s\n",hashTable[bucket].wordOne);
+        hashTable[bucket].wordTwo = wordTwoStatic;
+        printf("%s\n",hashTable[bucket].wordTwo);
+        hashTable[bucket].combined = combined;
+        printf("%s\n",hashTable[bucket].combined);
+        strcpy(wordOneStatic,wordTwoStatic);
+        free(wordTwo);
+        memset(combined,'\0',sizeof(char)*100);
+        strcpy(wordOneStatic,wordTwoStatic);
+        strcpy(combined,wordOneStatic);
+        sizeTracker++;
 }
 
   return 0;

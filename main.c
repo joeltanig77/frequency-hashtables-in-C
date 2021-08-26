@@ -45,7 +45,6 @@ int main(int argc, char *argv[]) {
     printf("The argument number is %d\n",linesToPrint);
   }
   while (n < argc) {
-    printf("%d\n",argc);
     FILE* fp = fopen(argv[n],"r");
     if(fp == NULL) {
       fprintf(stderr,"Can't open file\n");
