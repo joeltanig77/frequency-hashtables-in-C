@@ -29,7 +29,7 @@ int isThereANumber(char argv[]) {
 
 int main(int argc, char *argv[]) {
    int linesToPrint = 0;
-   int size = 500;
+   int size = 1;
    struct Node** hashTable = NULL;
    hashTable = (struct Node**)calloc(size,sizeof(struct Node*));
    if (!hashTable){ fprintf(stderr,"Failed to allocate memory\n"); return 1;}

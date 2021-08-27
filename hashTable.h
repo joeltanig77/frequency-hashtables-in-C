@@ -4,9 +4,9 @@
 #include <stdio.h>
 
 struct Node {
-  char *wordOne;
-  char *wordTwo;
-  char *combined;
+  char wordOne[100];
+  char wordTwo[100];
+  char combined[100];
   struct Node * next;
   int freq;
 };

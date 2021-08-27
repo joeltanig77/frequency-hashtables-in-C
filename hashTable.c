@@ -8,7 +8,7 @@
 // Cursor assign temp to then free temp then continue walk.
 
 // TODO: Expand the hashTable next
-// TODO: Count freq and DONT HAVE DUPULACATE WORDS IN THE HASHTABLE FOR COLLUSIONS
+// TODO: Fix one off freq counter
 
 
 int cleanUpHashTable(struct Node **hashTable, int *size) {
@@ -90,9 +90,12 @@ int takeInPairs(FILE *fp, struct Node **hashTable,int *size) {
       if (hashTable[bucket] == NULL) {
           struct Node* node = (struct Node*)calloc(1,sizeof(struct Node));
           if(!node){fprintf(stderr,"Failed to allocate memory\n"); return 1;}
-          node->wordOne = wordOneStatic;
-          node->wordTwo = wordTwoStatic;
-          node->combined = combined;
+          strcpy(node->wordOne, wordOneStatic);
+          // node->wordOne = wordOneStatic;
+          // node->wordTwo = wordTwoStatic;
+          strcpy(node->wordTwo, wordTwoStatic);
+          // node->combined = combined;
+          strcpy(node->combined, combined);
           node->freq += 1;
 
           hashTable[bucket] = node;
@@ -114,15 +117,21 @@ int takeInPairs(FILE *fp, struct Node **hashTable,int *size) {
           // There is something in the bucket
           struct Node* cursor = hashTable[bucket];
 
+          if(strcmp(cursor->combined,combined) == 0) {
+              cursor->freq += 1; /////////////////////////ONE OFF ERROR
+              printf("%s\n",cursor->combined);
+              printf("%d\n",cursor->freq);
+              dubFlag = 1;
+          }
           while(cursor->next != NULL) {
             if(strcmp(cursor->combined,combined) == 0) {
-                cursor->freq += 1;
-                dubFlag = 1; //////////////////////////////// START HERE, FIX DUP PROBLEM!!!!
+                cursor->freq += 1; /////////////////////////ONE OFF ERROR
+                dubFlag = 1;
                 break;
             }
               cursor = cursor->next;
           }
-          if(dubFlag) {
+          if (dubFlag) {
             strcpy(wordOneStatic,wordTwoStatic);
             free(wordTwo);
             memset(combined,'\0',sizeof(char)*100);
@@ -137,10 +146,12 @@ int takeInPairs(FILE *fp, struct Node **hashTable,int *size) {
 
           struct Node* node = (struct Node*)calloc(1,sizeof(struct Node));
           if(!node){fprintf(stderr,"Failed to allocate memory\n"); return 1;}
-          node->wordOne = wordOneStatic;
-          node->wordTwo = wordTwoStatic;
-          node->combined = combined;
-
+          // node->wordOne = wordOneStatic;
+          // node->wordTwo = wordTwoStatic;
+          // node->combined = combined;
+          strcpy(node->wordOne, wordOneStatic);
+          strcpy(node->wordTwo, wordTwoStatic);
+          strcpy(node->combined, combined);
           cursor->next = node;
 
 
@@ -154,10 +165,8 @@ int takeInPairs(FILE *fp, struct Node **hashTable,int *size) {
           strcpy(combined,wordOneStatic);
           sizeTracker++;
 
-
-
-
 }
+
 
   return 0;
 

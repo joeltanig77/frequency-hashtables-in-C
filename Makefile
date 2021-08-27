@@ -11,7 +11,7 @@ clean:
 	rm -f *.o
 
 bug: ${EXEC}
-	gdb -tui --args ./${EXEC} 44 gettysburg.txt
+	gdb -tui --args ./${EXEC} 44 test.txt
 
 valgrind: ${EXEC}
 	valgrind -s --leak-check=full ./${EXEC} 44 gettysburg.txt
