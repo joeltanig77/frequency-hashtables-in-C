@@ -5,8 +5,31 @@
 #include "crc64.h"
 #include "hashTable.h"
 
-
 // Cursor assign temp to then free temp then continue walk.
+
+int cleanUpHashTable(struct Node **hashTable, int size) {
+    for (int i = 0; i < size; i++) {
+        if(hashTable[i] != NULL) {
+          struct Node* cursor = hashTable[i];
+          struct Node* temp = NULL;
+          if(cursor->next == NULL) {
+              free(cursor);
+              continue;
+          }
+          while(cursor->next != NULL) {
+              temp = cursor;
+              cursor = cursor->next;
+              free(temp);
+          }
+          free(cursor);
+        }
+    }
+    return 0;
+}
+
+
+
+
 int takeInPairs(FILE *fp, struct Node **hashTable,int size) {
     char wordOneStatic[100];
     char wordTwoStatic[100];

@@ -18,4 +18,10 @@ int takeInPairs(FILE *fp, struct Node **hashTable,int size);
 
 
 
+
+int cleanUpHashTable(struct Node **hashTable, int size);
+
+
+
+
 #endif
