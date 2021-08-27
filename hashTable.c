@@ -32,7 +32,7 @@ int cleanUpHashTable(struct Node **hashTable, int *size) {
 }
 
 int growHashTable (struct Node** hashTable, int *size) {
-    *size = (*size *3);
+    *size = (*size*3);
     int bucket;
     struct Node** newHashTable = NULL;
     newHashTable = (struct Node**)calloc(*size,sizeof(struct Node*));
@@ -41,11 +41,25 @@ int growHashTable (struct Node** hashTable, int *size) {
       if (hashTable[i] != NULL) {
           struct Node* cursor = hashTable[i];
           // Need to save the node here
-          if(cursor->next == NULL) {
+          if(cursor->next == NULL) { ///////////////This causes seg fault cursor is not acessable
               bucket = (crc64(cursor->combined) % *size);
               newHashTable[bucket] = cursor;
               continue;
           }
+          // There is something attached to node here
+          bucket = (crc64(cursor->combined) % *size);
+          newHashTable[bucket] = cursor;
+
+          while(cursor->next != NULL) {
+              bucket = (crc64(cursor->combined) % *size);
+              newHashTable[bucket] = cursor;
+              cursor = cursor->next;
+            }
+
+
+
+
+
           // while(cursor->next != NULL) {
           //     temp = cursor;
           //     cursor = cursor->next;
@@ -60,6 +74,7 @@ int growHashTable (struct Node** hashTable, int *size) {
     // Then free the other hashTable
 
     }
+    hashTable = newHashTable;
     return 0;
   }
 
@@ -131,13 +146,19 @@ int takeInPairs(FILE *fp, struct Node **hashTable,int *size) {
             }
               cursor = cursor->next;
           }
+
+          if(strcmp(cursor->combined,combined) == 0) {
+              cursor->freq += 1; /////////////////////////ONE OFF ERROR
+              dubFlag = 1;
+
+          }
+
           if (dubFlag) {
             strcpy(wordOneStatic,wordTwoStatic);
             free(wordTwo);
             memset(combined,'\0',sizeof(char)*100);
             strcpy(wordOneStatic,wordTwoStatic);
             strcpy(combined,wordOneStatic);
-            sizeTracker++;
             dubFlag = 0;
             continue;
           }
@@ -152,6 +173,7 @@ int takeInPairs(FILE *fp, struct Node **hashTable,int *size) {
           strcpy(node->wordOne, wordOneStatic);
           strcpy(node->wordTwo, wordTwoStatic);
           strcpy(node->combined, combined);
+          node->freq += 1;
           cursor->next = node;
 
 
