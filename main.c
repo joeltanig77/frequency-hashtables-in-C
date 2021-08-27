@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
    int size = 500;
    struct Node** hashTable = NULL;
    hashTable = (struct Node**)calloc(size,sizeof(struct Node*));
-   if (hashTable == NULL){ fprintf(stderr,"Failed to allocate memory"); return 1;}
+   if (!hashTable){ fprintf(stderr,"Failed to allocate memory\n"); return 1;}
 
   int n = 1; // Arg counter that skips the pathway (pwd)
   if (isThereANumber(argv[1]) == 2) {
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
       n++;
 
       // Insert file pointer to insert to hashtable
-      takeInPairs(fp,hashTable,size);
+      takeInPairs(fp,hashTable,&size);
 
 
       //char *c = getNextWord(fp);
@@ -67,7 +67,8 @@ int main(int argc, char *argv[]) {
       fclose(fp);
   }
 
-   cleanUpHashTable(hashTable,size);
+
+   cleanUpHashTable(hashTable,&size);
 
    free(hashTable);
 

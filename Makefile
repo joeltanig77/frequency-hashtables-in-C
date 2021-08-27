@@ -1,7 +1,7 @@
 CPP = gcc
 FLAGS = -Wall -pedantic -g
 
-EXEC = wordPairs
+EXEC = wordpairs
 OBJS = main.o getWord.o hashTable.o crc64.o
 
 default:${EXEC}

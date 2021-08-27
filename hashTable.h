@@ -7,20 +7,18 @@ struct Node {
   char *wordOne;
   char *wordTwo;
   char *combined;
-  struct Node * prev;
   struct Node * next;
+  int freq;
 };
 
 
 /* A function that takes in a file pointer, a hashtable and the initial size of
   the hashtable and inserts the word pairs of a text file   */
-int takeInPairs(FILE *fp, struct Node **hashTable,int size);
+int takeInPairs(FILE *fp, struct Node **hashTable,int *size);
 
 
 
-
-int cleanUpHashTable(struct Node **hashTable, int size);
-
+int cleanUpHashTable(struct Node **hashTable, int *size);
 
 
 
