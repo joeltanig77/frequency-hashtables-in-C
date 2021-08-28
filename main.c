@@ -29,10 +29,10 @@ int isThereANumber(char argv[]) {
 
 int main(int argc, char *argv[]) {
    int linesToPrint = 0;
-   int size = 200;
+   int size = 1;
    struct Node** hashTable = NULL;
    hashTable = (struct Node**)calloc(size,sizeof(struct Node*));
-   if (!hashTable){ fprintf(stderr,"Failed to allocate memory\n"); return 1;}
+   if (!hashTable){ fprintf(stderr,"Failed to allocate memory\n"); exit(1);}
 
   int n = 1; // Arg counter that skips the pathway (pwd)
   if (isThereANumber(argv[1]) == 2) {

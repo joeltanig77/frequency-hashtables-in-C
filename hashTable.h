@@ -4,9 +4,9 @@
 #include <stdio.h>
 
 struct Node {
-  char wordOne[100];
-  char wordTwo[100];
-  char combined[100];
+  char wordOne[256];
+  char wordTwo[256];
+  char combined[512];
   struct Node * next;
   int freq;
 };
@@ -14,6 +14,7 @@ struct Node {
 
 /* A function that takes in a file pointer, a hashtable and the initial size of
   the hashtable and inserts the word pairs of a text file   */
+
 int takeInPairs(FILE *fp, struct Node **hashTable,int *size);
 
 
@@ -22,6 +23,9 @@ int cleanUpHashTable(struct Node **hashTable, int *size);
 
 
 int growHashTable (struct Node** hashTable, int *size);
+
+
+int reHashWalk (struct Node** newHashTable,struct Node* cursor, int *size);
 
 
 
