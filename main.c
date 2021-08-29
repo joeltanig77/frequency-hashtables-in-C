@@ -29,7 +29,8 @@ int isThereANumber(char argv[]) {
 
 int main(int argc, char *argv[]) {
    int linesToPrint = 0;
-   int size = 50;
+   int size = 5;
+   int sizeTracker = 0;
    struct Node** hashTable = NULL;
    hashTable = (struct Node**)calloc(size,sizeof(struct Node*));
    if (!hashTable){ fprintf(stderr,"Failed to allocate memory\n"); exit(1);}
@@ -53,7 +54,7 @@ int main(int argc, char *argv[]) {
       n++;
 
       // Insert file pointer to insert to hashtable
-      takeInPairs(fp,hashTable,&size);
+      takeInPairs(fp,hashTable,&size,&sizeTracker);
 
 
       //char *c = getNextWord(fp);
@@ -68,7 +69,7 @@ int main(int argc, char *argv[]) {
   }
 
 
-   cleanUpHashTable(hashTable,&size);
+
 
    free(hashTable);
 

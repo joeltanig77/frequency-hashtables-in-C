@@ -9,6 +9,7 @@
 
 // TODO 1: Keep working on Hashtables Expansion! Line 110 not assigning properly
 // TODO: Fix one off freq counter (maybe)
+//CHECK TO SEE IF THIS GROW Hashtableis ACTUALLY Growing
 // TODO 3: Put everything into an Array and use Qsort so walk the hashTable and
 // put everything into an array.
 
@@ -35,11 +36,12 @@ int cleanUpHashTable(struct Node **hashTable, int *size) {
 
 int growHashTable (struct Node** hashTable, int *size) {
     // Growing the hashTable by a factor of three
-    *size = (*size*2);
+    int oldHashTableSize = *size;
+    *size = (*size*3); // New size of the Hashtable
     struct Node** newHashTable = NULL;
     newHashTable = (struct Node**)calloc(*size,sizeof(struct Node*));
     if(!newHashTable){ fprintf(stderr,"Failed to allocate memory\n"); exit(1);}
-    for (int i = 0; i < *size; i++) {
+    for (int i = 0; i < oldHashTableSize; i++) {
       if (hashTable[i] != NULL) {
           reHashWalk(newHashTable,hashTable[i],size);
 
@@ -59,8 +61,9 @@ int growHashTable (struct Node** hashTable, int *size) {
     // Then finally reassign the old hashTable
     // Then free the other hashTable
     }
-    cleanUpHashTable(hashTable,size);
+    cleanUpHashTable(hashTable,&oldHashTableSize);
     hashTable = newHashTable;
+  //  cleanUpHashTable(newHashTable,size);
     return 0;
   }
 
@@ -113,11 +116,10 @@ int reHashWalk (struct Node** newHashTable,struct Node* cursor, int *size) {
 
 
 
-int takeInPairs(FILE *fp, struct Node **hashTable,int *size) {
+int takeInPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeTracker) {
       char wordOneStatic[256];
       char wordTwoStatic[256];
       char combined[512];
-      int sizeTracker = 0;
       int dubFlag = 0;
       int bucket;
       char *wordOne = getNextWord(fp);
@@ -127,7 +129,7 @@ int takeInPairs(FILE *fp, struct Node **hashTable,int *size) {
       char *wordTwo = NULL;
       while((wordTwo = getNextWord(fp))!= NULL) {
           ///////////////////////////////////// TODO: START HERE
-          if (sizeTracker == (*size/2)) {
+          if (*sizeTracker == (*size/2)) {
               growHashTable(hashTable,size);
           }
 
@@ -156,7 +158,7 @@ int takeInPairs(FILE *fp, struct Node **hashTable,int *size) {
             memset(combined,'\0',sizeof(char)*100);
             strcpy(wordOneStatic,wordTwoStatic);
             strcpy(combined,wordOneStatic);
-            sizeTracker++;
+            *sizeTracker += 1;
             continue;
         }
 
@@ -211,7 +213,7 @@ int takeInPairs(FILE *fp, struct Node **hashTable,int *size) {
             memset(combined,'\0',sizeof(char)*100);
             strcpy(wordOneStatic,wordTwoStatic);
             strcpy(combined,wordOneStatic);
-            sizeTracker++;
+            *sizeTracker += 1;
     }
     return 0;
 

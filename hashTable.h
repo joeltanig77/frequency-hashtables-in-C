@@ -15,7 +15,7 @@ struct Node {
 /* A function that takes in a file pointer, a hashtable and the initial size of
   the hashtable and inserts the word pairs of a text file   */
 
-int takeInPairs(FILE *fp, struct Node **hashTable,int *size);
+int takeInPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeTracker);
 
 
 
