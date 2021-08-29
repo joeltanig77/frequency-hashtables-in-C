@@ -35,14 +35,13 @@ int cleanUpHashTable(struct Node **hashTable, int *size) {
 
 int growHashTable (struct Node** hashTable, int *size) {
     // Growing the hashTable by a factor of three
-    *size = (*size*3);
+    *size = (*size*2);
     struct Node** newHashTable = NULL;
     newHashTable = (struct Node**)calloc(*size,sizeof(struct Node*));
     if(!newHashTable){ fprintf(stderr,"Failed to allocate memory\n"); exit(1);}
     for (int i = 0; i < *size; i++) {
       if (hashTable[i] != NULL) {
-          struct Node* cursor = hashTable[i];
-          reHashWalk(newHashTable,cursor,size);
+          reHashWalk(newHashTable,hashTable[i],size);
 
 
 
@@ -68,36 +67,48 @@ int growHashTable (struct Node** hashTable, int *size) {
 
 
 int reHashWalk (struct Node** newHashTable,struct Node* cursor, int *size) {
+    if (cursor == NULL) {
+      return 0;
+    }
     // rehash method here
     int newBucket = 0;
-    // Nothing in the old hashTable bucket
+    // Something is in the new hashTable bucket
     newBucket = (crc64(cursor->combined) % *size);
-    struct Node* newHashTableCursor = newHashTable[newBucket];
-    if(cursor->next == NULL) { ///////////////This causes seg fault cursor is not acessable
-      // Need to check if its already in the bucket for the newHashTable
-        // If there is something in the new Hashtable
-        if(newHashTable[newBucket] != NULL) {
-          while (newHashTableCursor->next != NULL) { /////////// Something wrong with the cursor
-              newHashTableCursor = newHashTableCursor->next;
-          }
+    if(newHashTable[newBucket] != NULL) {
+      struct Node* newHashTableCursor = newHashTable[newBucket];
+      while (newHashTableCursor->next != NULL) { /////////// Something wrong with the cursor
+          newHashTableCursor = newHashTableCursor->next;
+      }
+      // If there is something in the new Hashtable
+      // We know the newHashTable[newBucket] == NULL
+          struct Node* node = (struct Node*)calloc(1,sizeof(struct Node));  // FREE THIS
+          if(!node){fprintf(stderr,"Failed to allocate memory\n"); return 1;}
+          strcpy(node->wordOne,cursor->wordOne);
+          strcpy(node->wordTwo,cursor->wordTwo);
+          strcpy(node->combined,cursor->combined);
+          node->freq = cursor->freq;
+          // The newHashTable[newBucket]->next == NULL is so insert
+          newHashTableCursor->next = node;              /////////// Something wrong with the cursor as it == NULL still
+    }
+    //Nothing in the new Hashtable bucket
+    else {
+      struct Node* node = (struct Node*)calloc(1,sizeof(struct Node));  // FREE THIS
+      if(!node){fprintf(stderr,"Failed to allocate memory\n"); return 1;}
+      strcpy(node->wordOne,cursor->wordOne);
+      strcpy(node->wordTwo,cursor->wordTwo);
+      strcpy(node->combined,cursor->combined);
+      node->freq = cursor->freq;
+      newHashTable[newBucket] = node;
+    }
+
+
+        // newHashTableCursor = cursor;
+        // Keep walking the old hashTable bucket
+        if(cursor != NULL) {
+          cursor = cursor->next;
+          reHashWalk(newHashTable,cursor,size);
         }
-        // The newHashTable[newBucket]->next == NULL is so insert
-        //newHashTableCursor = cursor;
-        struct Node* node = (struct Node*)calloc(1,sizeof(struct Node));  // FREE THIS
-        if(!node){fprintf(stderr,"Failed to allocate memory\n"); return 1;}
-        strcpy(node->wordOne,cursor->wordOne);
-        strcpy(node->wordTwo,cursor->wordTwo);
-        strcpy(node->combined,cursor->combined);
-        node->freq = cursor->freq;
-
-        newHashTableCursor = node;               /////////// Something wrong with the cursor as it == NULL still
-
         return 0;
-  }
-    // Keep walking the old hashTable bucket
-    cursor = cursor->next;
-    reHashWalk(newHashTable,cursor,size);
-    return 0;
 }
 
 
@@ -115,10 +126,10 @@ int takeInPairs(FILE *fp, struct Node **hashTable,int *size) {
       free(wordOne);
       char *wordTwo = NULL;
       while((wordTwo = getNextWord(fp))!= NULL) {
-          // ///////////////////////////////////// TODO: START HERE
-          // if (sizeTracker == (*size/2)) {
-          //     growHashTable(hashTable,size);
-          // }
+          ///////////////////////////////////// TODO: START HERE
+          if (sizeTracker == (*size/2)) {
+              growHashTable(hashTable,size);
+          }
 
           strcpy(wordTwoStatic,wordTwo);
           strcat(combined,wordTwoStatic);
