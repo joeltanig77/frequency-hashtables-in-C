@@ -7,7 +7,7 @@
 
 // Cursor assign temp to then free temp then continue walk.
 
-// TODO 1: Keep working on Hashtables Expansion! Line 110 not assigning properly
+// TODO 1: Keep working on Hashtables Expansion! Line 66 not assigning properly
 // TODO: Fix one off freq counter (maybe)
 //CHECK TO SEE IF THIS GROW Hashtableis ACTUALLY Growing
 // TODO 3: Put everything into an Array and use Qsort so walk the hashTable and
@@ -61,8 +61,9 @@ int growHashTable (struct Node** hashTable, int *size) {
     // Then finally reassign the old hashTable
     // Then free the other hashTable
     }
-    cleanUpHashTable(hashTable,&oldHashTableSize);
-    hashTable = newHashTable;
+
+  //  cleanUpHashTable(hashTable,&oldHashTableSize);
+    hashTable = newHashTable;       ///////////////NOT SAVING THIS INSTANCE of the old hashTable
   //  cleanUpHashTable(newHashTable,size);
     return 0;
   }
@@ -75,11 +76,11 @@ int reHashWalk (struct Node** newHashTable,struct Node* cursor, int *size) {
     }
     // rehash method here
     int newBucket = 0;
-    // Something is in the new hashTable bucket
     newBucket = (crc64(cursor->combined) % *size);
+    // If something is in the new hashTable bucket
     if(newHashTable[newBucket] != NULL) {
       struct Node* newHashTableCursor = newHashTable[newBucket];
-      while (newHashTableCursor->next != NULL) { /////////// Something wrong with the cursor
+      while (newHashTableCursor->next != NULL) {
           newHashTableCursor = newHashTableCursor->next;
       }
       // If there is something in the new Hashtable
@@ -129,15 +130,17 @@ int takeInPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeTracker) {
       char *wordTwo = NULL;
       while((wordTwo = getNextWord(fp))!= NULL) {
           ///////////////////////////////////// TODO: START HERE
-          if (*sizeTracker == (*size/2)) {
-              growHashTable(hashTable,size);
-          }
+          // if (*sizeTracker == (*size/2)) {
+          //     growHashTable(hashTable,size);
+          // }
 
           strcpy(wordTwoStatic,wordTwo);
           strcat(combined,wordTwoStatic);
 
           bucket = crc64(combined) % *size;
-
+            printf("%s\n",wordOne);
+          //  printf("%s\n",wordTwo);
+            printf("%s\n",combined);
         // If the hashTable is empty put in the node
         if (hashTable[bucket] == NULL) {
             struct Node* node = (struct Node*)calloc(1,sizeof(struct Node));
@@ -150,9 +153,9 @@ int takeInPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeTracker) {
             hashTable[bucket] = node;
 
 
-            printf("%s\n",hashTable[bucket]->wordOne);
-            printf("%s\n",hashTable[bucket]->wordTwo);
-            printf("%s\n",hashTable[bucket]->combined);
+          //  printf("%s\n",hashTable[bucket]->wordOne);
+          //  printf("%s\n",hashTable[bucket]->wordTwo);
+            //printf("%s\n",hashTable[bucket]->combined);
             strcpy(wordOneStatic,wordTwoStatic);
             free(wordTwo);
             memset(combined,'\0',sizeof(char)*100);
@@ -205,9 +208,9 @@ int takeInPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeTracker) {
             strcpy(node->combined, combined);
             node->freq += 1;
             cursor->next = node;
-            printf("%s\n",cursor->wordOne);
-            printf("%s\n",cursor->wordTwo);
-            printf("%s\n",cursor->combined);
+          //  printf("%s\n",cursor->wordOne);
+          //  printf("%s\n",cursor->wordTwo);
+          //  printf("%s\n",cursor->combined);
             strcpy(wordOneStatic,wordTwoStatic);
             free(wordTwo);
             memset(combined,'\0',sizeof(char)*100);
