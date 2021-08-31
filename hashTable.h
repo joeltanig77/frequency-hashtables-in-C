@@ -22,7 +22,7 @@ int takeInPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeTracker);
 int cleanUpHashTable(struct Node **hashTable, int *size);
 
 
-int growHashTable (struct Node** hashTable, int *size);
+struct Node** growHashTable (struct Node** hashTable, int *size);
 
 
 int reHashWalk (struct Node** newHashTable,struct Node* cursor, int *size);

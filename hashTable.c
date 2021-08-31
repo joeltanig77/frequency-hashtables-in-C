@@ -34,25 +34,19 @@ int cleanUpHashTable(struct Node **hashTable, int *size) {
     return 0;
 }
 
-int growHashTable (struct Node** hashTable, int *size) {
+
+
+struct Node** growHashTable (struct Node** hashTable, int *size) {
     // Growing the hashTable by a factor of three
     int oldHashTableSize = *size;
     *size = (*size*3); // New size of the Hashtable
     struct Node** newHashTable = NULL;
+    struct Node** temp = NULL;
     newHashTable = (struct Node**)calloc(*size,sizeof(struct Node*));
     if(!newHashTable){ fprintf(stderr,"Failed to allocate memory\n"); exit(1);}
     for (int i = 0; i < oldHashTableSize; i++) {
       if (hashTable[i] != NULL) {
           reHashWalk(newHashTable,hashTable[i],size);
-
-
-
-
-          // while(cursor->next != NULL) {
-          //     temp = cursor;
-          //     cursor = cursor->next;
-          //     free(temp);
-          // }
 
     }
     // Need to make a walk function here that takes all the nodes in the
@@ -62,10 +56,15 @@ int growHashTable (struct Node** hashTable, int *size) {
     // Then free the other hashTable
     }
 
-  //  cleanUpHashTable(hashTable,&oldHashTableSize);
+    cleanUpHashTable(hashTable,&oldHashTableSize); // Might have to assign this to something this has to be empty
+    temp = hashTable;
+    free(temp);
     hashTable = newHashTable;       ///////////////NOT SAVING THIS INSTANCE of the old hashTable
+    //copyOldHashTableToNew(hashTable,newHashTable,size);
+    // NEED TO COPY EVERYTHING AGAIN
+
   //  cleanUpHashTable(newHashTable,size);
-    return 0;
+    return hashTable;
   }
 
 
@@ -117,7 +116,7 @@ int reHashWalk (struct Node** newHashTable,struct Node* cursor, int *size) {
 
 
 
-int takeInPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeTracker) {
+int takeInPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeTracker) { // Make this a void star
       char wordOneStatic[256];
       char wordTwoStatic[256];
       char combined[512];
@@ -130,9 +129,10 @@ int takeInPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeTracker) {
       char *wordTwo = NULL;
       while((wordTwo = getNextWord(fp))!= NULL) {
           ///////////////////////////////////// TODO: START HERE
-          // if (*sizeTracker == (*size/2)) {
-          //     growHashTable(hashTable,size);
-          // }
+          if (*sizeTracker == (*size/2)) {
+            //  struct Node **hashTable;
+              hashTable = growHashTable(hashTable,size);
+          }
 
           strcpy(wordTwoStatic,wordTwo);
           strcat(combined,wordTwoStatic);

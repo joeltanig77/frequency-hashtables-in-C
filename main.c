@@ -69,8 +69,8 @@ int main(int argc, char *argv[]) {
   }
 
 
-   cleanUpHashTable(hashTable,&size);
-
+  // hashTable = cleanUpHashTable(hashTable,&size); // START HERE
+    cleanUpHashTable(hashTable,&size);
    free(hashTable);
 
   return 0;
