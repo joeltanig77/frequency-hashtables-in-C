@@ -28,5 +28,7 @@ struct Node** growHashTable (struct Node** hashTable, int *size);
 int reHashWalk (struct Node** newHashTable,struct Node* cursor, int *size);
 
 
+int putAllStuctsIntoArray(struct Node **hashTable,int *sizeTracker,int *size,struct Node *arrayOfStructs[]);
+
 
 #endif

@@ -29,11 +29,13 @@ int isThereANumber(char argv[]) {
 
 int main(int argc, char *argv[]) {
    int linesToPrint = 0;
-   int size = 5;
+   int size = 25;
    int sizeTracker = 0;
+   struct Node** arrayOfStructs = NULL;
    struct Node** hashTable = NULL;
    hashTable = (struct Node**)calloc(size,sizeof(struct Node*));
    if (!hashTable){ fprintf(stderr,"Failed to allocate memory\n"); exit(1);}
+
 
   int n = 1; // Arg counter that skips the pathway (pwd)
   if (isThereANumber(argv[1]) == 2) {
@@ -56,22 +58,19 @@ int main(int argc, char *argv[]) {
       // Insert file pointer to insert to hashtable
       takeInPairs(fp,hashTable,&size,&sizeTracker);
 
+      arrayOfStructs = (struct Node**)calloc(sizeTracker,sizeof(struct Node*));
+      if (!arrayOfStructs){ fprintf(stderr,"Failed to allocate memory\n"); exit(1);}
 
-      //char *c = getNextWord(fp);
-      //printf("%s\n",c); //TODO: When I print this, then it leaks
-      // The string is dynamic!!!!
-      //  free(c);
-
+      putAllStuctsIntoArray(hashTable,&sizeTracker,&size,arrayOfStructs);
 
 
       // Close file pointer
       fclose(fp);
   }
 
-
-  // hashTable = cleanUpHashTable(hashTable,&size); // START HERE
-    cleanUpHashTable(hashTable,&size);
-   free(hashTable);
+   free(arrayOfStructs);
+   cleanUpHashTable(hashTable,&size); //TURN THIS OFF WHEN I DO RESIZE!
+   free(hashTable);                   //TURN THIS OFF WHEN I DO RESIZE!
 
   return 0;
 }
