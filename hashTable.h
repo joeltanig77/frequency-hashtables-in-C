@@ -30,5 +30,6 @@ int reHashWalk (struct Node** newHashTable,struct Node* cursor, int *size);
 
 int putAllStuctsIntoArray(struct Node **hashTable,int *sizeTracker,int *size,struct Node *arrayOfStructs[]);
 
+int compareFreq(const void *compare1,const void *compare2);
 
 #endif

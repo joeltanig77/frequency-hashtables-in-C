@@ -7,11 +7,10 @@
 
 // Cursor assign temp to then free temp then continue walk.
 
-// TODO 1: Keep working on Hashtables Expansion! Line 66 not assigning properly
-// TODO: Fix one off freq counter (maybe)
+// TODO 1:Need to do some UI stuff and fix the freq counting
+// TODO 2: Keep working on Hashtables Expansion! Line 66 not assigning properly
 //CHECK TO SEE IF THIS GROW Hashtableis ACTUALLY Growing
-// TODO 3: Put everything into an Array and use Qsort so walk the hashTable and
-// put everything into an array.
+
 
 
 int cleanUpHashTable(struct Node **hashTable, int *size) {
@@ -34,12 +33,12 @@ int cleanUpHashTable(struct Node **hashTable, int *size) {
     return 0;
 }
 
-// 
-// int compareFreq(const void *compare1,const void *compare2) {
-//     const struct Node *node1 = (struct *Node)compare1;
-//     const struct Node *node2 = (struct *Node)compare2;
-//     return (compare2->freq - compare1->freq);
-// }
+
+int compareFreq(const void *compare1,const void *compare2) {
+    struct Node **node1 = (struct Node **)compare1;
+    struct Node **node2 = (struct Node **)compare2;
+    return (*node1)->freq - (*node2)->freq;
+}
 
 
 
@@ -144,6 +143,7 @@ int putAllStuctsIntoArray(struct Node **hashTable,int *sizeTracker,int *size,str
             arrayOfStructs[j] = cursor;
             cursor = cursor->next;
         }
+        // If cursor->next == NULL insert the last cursor
         j++;
         arrayOfStructs[j] = cursor;
       }

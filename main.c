@@ -8,9 +8,14 @@
 
 // atoi() turns a string into a integer
 
-// 1 = there is a legal integer and 2 = not a legal integer
+// 1 = there is a legal integer and 2 = not a legal integer 3 = no - seen
 int isThereANumber(char argv[]) {
   int index = 0;
+  // if(argv[0] != 45){
+  //   return 3;
+  // }
+  // Skip the - sign
+  index++;
   while(argv[index] != '\0') {
     if(isdigit(argv[index])) {
       index++;
@@ -42,6 +47,11 @@ int main(int argc, char *argv[]) {
     printf("%s\n","Not a number");
     linesToPrint = -1; // Print Everything
   }
+  // else if (isThereANumber(argv[1]) == 3) {
+  //   fprintf(stderr,"Can't read file '%s'\n",argv[1]);
+  //   free(hashTable);
+  //   exit(0);
+  // }
   else {
     n++; // Incrementing counter
     linesToPrint = atoi(argv[1]); // Turn string into a integer
@@ -63,6 +73,14 @@ int main(int argc, char *argv[]) {
 
       putAllStuctsIntoArray(hashTable,&sizeTracker,&size,arrayOfStructs);
 
+
+      qsort(arrayOfStructs,sizeTracker,sizeof(struct Node*),compareFreq);
+
+      for(int i=0; i < sizeTracker; i++) {
+          printf("%s",arrayOfStructs[i]->wordOne);
+          printf(" %s\n",arrayOfStructs[i]->wordTwo);
+          printf("%d\n",arrayOfStructs[i]->freq);
+      }
 
       // Close file pointer
       fclose(fp);
