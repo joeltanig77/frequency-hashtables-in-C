@@ -208,8 +208,8 @@ int takeInPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeTracker) { 
 
             if(strcmp(cursor->combined,combined) == 0) {
                 cursor->freq += 1; /////////////////////////ONE OFF ERROR
-                printf("%s\n",cursor->combined);
-                printf("%d\n",cursor->freq);
+              //  printf("%s\n",cursor->combined);
+              //  printf("%d\n",cursor->freq);
                 dubFlag = 1;
             }
             while(cursor->next != NULL) {

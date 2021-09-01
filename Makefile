@@ -11,13 +11,13 @@ clean:
 	rm -f *.o
 
 bug: ${EXEC}
-	gdb -tui --args ./${EXEC} -44 gettysburg.txt
+	gdb -tui --args ./${EXEC} -4 test.txt
 
 valgrind: ${EXEC}
-	valgrind --leak-check=full --track-origins=yes ./${EXEC} -44 gettysburg.txt
+	valgrind --leak-check=full --track-origins=yes ./${EXEC} -4 test.txt
 
 run: ${EXEC}
-	./${EXEC} -44 gettysburg.txt
+	./${EXEC} -4 test.txt
 
 ${EXEC}:${OBJS}
 	${CPP} ${FLAGS} -o ${EXEC} ${OBJS}
