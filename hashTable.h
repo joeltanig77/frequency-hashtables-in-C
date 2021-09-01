@@ -16,10 +16,13 @@ struct Node {
 /* A function that takes in a file pointer, a hashtable and the initial size of
   the hashtable and inserts the word pairs of a text file */
 
-struct Node** takeInPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeTracker);
+struct Node** readWordPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeTracker);
 
 
 struct Node** growHashTable(struct Node** hashTable, int *size);
+
+
+struct Node** insertIntoHashTable(struct Node **hashTable,int *size,int *sizeTracker,struct Node *node,char combined[512]);
 
 
 int cleanUpHashTable(struct Node **hashTable, int *size);
@@ -28,12 +31,10 @@ int cleanUpHashTable(struct Node **hashTable, int *size);
 int reHashWalk(struct Node** newHashTable,struct Node* cursor, int *size);
 
 
-int putAllStuctsIntoArray(struct Node **hashTable, int *sizeTracker, int *size, struct Node **arrayOfStructs);
+int putAllStructsIntoArray(struct Node **hashTable, int *sizeTracker, int *size, struct Node **arrayOfStructs);
 
 
 int compareFreq(const void *compare1, const void *compare2);
-
-
 
 
 

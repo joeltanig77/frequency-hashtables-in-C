@@ -121,7 +121,7 @@ int reHashWalk (struct Node** newHashTable,struct Node* cursor, int *size) {
 
 
 
-int putAllStuctsIntoArray(struct Node **hashTable,int *sizeTracker,int *size,struct Node **arrayOfStructs) {
+int putAllStructsIntoArray(struct Node **hashTable,int *sizeTracker,int *size,struct Node **arrayOfStructs) {
   int j = 0;
   int sizeOfItems = *size;
   for (int i = 0; i < sizeOfItems; i++) {
@@ -153,13 +153,62 @@ int putAllStuctsIntoArray(struct Node **hashTable,int *sizeTracker,int *size,str
 }
 
 
+struct Node** insertIntoHashTable(struct Node **hashTable,int *size,int *sizeTracker,struct Node *node,char combined[512]) { // Make this a void star
+      int bucket = crc64(combined) % *size;
+      int dubFlag = 0;
+      //DEBUG "To the"
+    if (hashTable[bucket] == NULL) {
+        node->freq += 1;
+        hashTable[bucket] = node;
+        *sizeTracker += 1;
+        return hashTable;
+    }
 
-struct Node** takeInPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeTracker) { // Make this a void star
+        // There is something in the bucket
+        struct Node* cursor = hashTable[bucket];
+        printf("%s\n",cursor->combined);
+        // If there is nothing connected to the node->next property
+        if(strcmp(cursor->combined,combined) == 0 && cursor->next == NULL) {
+            cursor->freq += 1; /////////////////////////ONE OFF ERROR
+            printf("%s\n",cursor->combined);
+          //  printf("%d\n",cursor->freq);
+            dubFlag = 1;
+        }
+        else {
+          while(cursor->next != NULL) {
+            if(strcmp(cursor->combined,combined) == 0) {
+                cursor->freq += 1; /////////////////////////ONE OFF ERROR
+                dubFlag = 1;
+                break;
+            }
+              //skipFlag = 1; // ALMOST HAVE INSERT WORKING START HERE!!!!
+              cursor = cursor->next;
+          }
+          // Cursor->next == NULL here
+          // Catch the last node in the linked list    // ALMOST HAVE INSERT WORKING START HERE!!!!
+          if(cursor->next == NULL && strcmp(cursor->combined,combined) == 0) {
+              cursor->freq += 1; /////////////////////////ONE OFF ERROR
+              dubFlag = 1;
+          }
+        }
+        if (dubFlag) {
+          dubFlag = 0;
+          free(node);
+          return hashTable;
+        }
+        // Better be no duplicates here....
+        node->freq += 1;
+        cursor->next = node;
+        *sizeTracker += 1;
+        return hashTable;
+}
+
+
+
+struct Node** readWordPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeTracker) { // Make this a void star
       char wordOneStatic[256];
       char wordTwoStatic[256];
       char combined[512];
-      int dubFlag = 0;
-      int bucket;
       char *wordOne = getNextWord(fp);
       strcpy(wordOneStatic,wordOne);
       strcpy(combined,wordOneStatic);
@@ -171,93 +220,25 @@ struct Node** takeInPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeT
           //   //  struct Node **hashTable;
           //     hashTable = growHashTable(hashTable,size);
           // }
-
           strcpy(wordTwoStatic,wordTwo);
           strcat(combined,wordTwoStatic);
+          struct Node* node = (struct Node*)calloc(1,sizeof(struct Node));
+          if(!node){fprintf(stderr,"Failed to allocate memory\n"); return NULL;}
+          strcpy(node->wordOne, wordOneStatic);
+          strcpy(node->wordTwo, wordTwoStatic);
+          strcpy(node->combined, combined);
+          hashTable = insertIntoHashTable(hashTable,size,sizeTracker,node,combined);
 
-          bucket = crc64(combined) % *size;
             printf("%s\n",wordOne);
           //  printf("%s\n",wordTwo);
             printf("%s\n",combined);
         // If the hashTable is empty put in the node
-        if (hashTable[bucket] == NULL) {
-            struct Node* node = (struct Node*)calloc(1,sizeof(struct Node));
-            if(!node){fprintf(stderr,"Failed to allocate memory\n"); return NULL;}
-            strcpy(node->wordOne, wordOneStatic);
-            strcpy(node->wordTwo, wordTwoStatic);
-            strcpy(node->combined, combined);
-            node->freq += 1;
+          strcpy(wordOneStatic,wordTwoStatic);
+          free(wordTwo);
+          memset(combined,'\0',sizeof(char)*512);
+          strcpy(wordOneStatic,wordTwoStatic);
+          strcpy(combined,wordOneStatic);
 
-            hashTable[bucket] = node;
-
-
-          //  printf("%s\n",hashTable[bucket]->wordOne);
-          //  printf("%s\n",hashTable[bucket]->wordTwo);
-            //printf("%s\n",hashTable[bucket]->combined);
-            strcpy(wordOneStatic,wordTwoStatic);
-            free(wordTwo);
-            memset(combined,'\0',sizeof(char)*100);
-            strcpy(wordOneStatic,wordTwoStatic);
-            strcpy(combined,wordOneStatic);
-            *sizeTracker += 1;
-            continue;
-        }
-
-
-            // There is something in the bucket
-            struct Node* cursor = hashTable[bucket];
-            // If there is nothing connected to the node->next property
-            if(strcmp(cursor->combined,combined) == 0 && cursor->next == NULL) {
-                cursor->freq += 1; /////////////////////////ONE OFF ERROR
-              //  printf("%s\n",cursor->combined);
-              //  printf("%d\n",cursor->freq);
-                dubFlag = 1;
-            }
-            else {
-              while(cursor->next != NULL) {
-                if(strcmp(cursor->combined,combined) == 0) {
-                    cursor->freq += 1; /////////////////////////ONE OFF ERROR
-                    dubFlag = 1;
-                    break;
-                }
-                  //skipFlag = 1; // ALMOST HAVE INSERT WORKING START HERE!!!!
-                  cursor = cursor->next;
-              }
-              // Cursor->next == NULL here
-              // Catch the last node in the linked list    // ALMOST HAVE INSERT WORKING START HERE!!!!
-              if(cursor->next == NULL && strcmp(cursor->combined,combined) == 0) {
-                  cursor->freq += 1; /////////////////////////ONE OFF ERROR
-                  dubFlag = 1;
-              }
-            }
-
-            if (dubFlag) {
-              strcpy(wordOneStatic,wordTwoStatic);
-              free(wordTwo);
-              memset(combined,'\0',sizeof(char)*512);
-              strcpy(wordOneStatic,wordTwoStatic);
-              strcpy(combined,wordOneStatic);
-              dubFlag = 0;
-              continue;
-            }
-            // Better be no duplicates here....
-
-            struct Node* node = (struct Node*)calloc(1,sizeof(struct Node));
-            if(!node){fprintf(stderr,"Failed to allocate memory\n");return NULL;}
-            strcpy(node->wordOne, wordOneStatic);
-            strcpy(node->wordTwo, wordTwoStatic);
-            strcpy(node->combined, combined);
-            node->freq += 1;
-            cursor->next = node;
-          //  printf("%s\n",cursor->wordOne);
-          //  printf("%s\n",cursor->wordTwo);
-          //  printf("%s\n",cursor->combined);
-            strcpy(wordOneStatic,wordTwoStatic);
-            free(wordTwo);
-            memset(combined,'\0',sizeof(char)*512);
-            strcpy(wordOneStatic,wordTwoStatic);
-            strcpy(combined,wordOneStatic);
-            *sizeTracker += 1;
     }
     return hashTable;
 

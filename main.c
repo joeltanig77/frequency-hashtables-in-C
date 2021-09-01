@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
       n++;
 
       // Insert file pointer to insert to hashtable
-      hashTable = takeInPairs(fp,hashTable,&size,&sizeTracker);
+      hashTable = readWordPairs(fp,hashTable,&size,&sizeTracker);
 
       // Close file pointer
       fclose(fp);
@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
      }
 
 
-    putAllStuctsIntoArray(hashTable,&sizeTracker,&size,arrayOfStructs);
+    putAllStructsIntoArray(hashTable,&sizeTracker,&size,arrayOfStructs);
 
 
     qsort(arrayOfStructs,sizeTracker,sizeof(struct Node*),compareFreq);
