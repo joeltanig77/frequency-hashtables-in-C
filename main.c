@@ -37,7 +37,7 @@ int isThereANumber(char argv[]) {
 
 int main(int argc, char *argv[]) {
    int linesToPrint = 0;
-   int size = 25;
+   int size = 300;
    int sizeTracker = 0;
    struct Node** arrayOfStructs = NULL;
    struct Node** hashTable = NULL;
@@ -63,37 +63,40 @@ int main(int argc, char *argv[]) {
 
   else {
     n++; // Incrementing counter
-    linesToPrint = atoi(argv[1]); // Turn string into a integer
+    linesToPrint = atoi(argv[1])*-1; // Turn string into a integer
     printf("The argument number is %d\n",linesToPrint);
   }
   while (n < argc) {
     FILE* fp = fopen(argv[n],"r");
     if(fp == NULL) {
+      free(hashTable);
       fprintf(stderr,"Can't open file\n");
-      return 1;
+      exit(0);
     }
       n++;
 
       // Insert file pointer to insert to hashtable
-      takeInPairs(fp,hashTable,&size,&sizeTracker);
-
-      arrayOfStructs = (struct Node**)calloc(sizeTracker,sizeof(struct Node*));
-      if (!arrayOfStructs){ fprintf(stderr,"Failed to allocate memory\n"); exit(1);}
-
-      putAllStuctsIntoArray(hashTable,&sizeTracker,&size,arrayOfStructs);
-
-
-      qsort(arrayOfStructs,sizeTracker,sizeof(struct Node*),compareFreq);
-
-      for(int i=0; i < sizeTracker; i++) {
-          printf("%s",arrayOfStructs[i]->wordOne);
-          printf(" %s\n",arrayOfStructs[i]->wordTwo);
-          printf("%d\n",arrayOfStructs[i]->freq);
-      }
+      hashTable = takeInPairs(fp,hashTable,&size,&sizeTracker);
 
       // Close file pointer
       fclose(fp);
   }
+    arrayOfStructs = (struct Node**)calloc(sizeTracker,sizeof(struct Node*));
+    if (!arrayOfStructs){ fprintf(stderr,"Failed to allocate memory\n"); exit(1);}
+
+
+    putAllStuctsIntoArray(hashTable,&sizeTracker,&size,arrayOfStructs);
+
+
+    qsort(arrayOfStructs,sizeTracker,sizeof(struct Node*),compareFreq);
+
+    for(int i=0; i < sizeTracker; i++) {
+        printf("%d",arrayOfStructs[i]->freq);
+        printf(" %s",arrayOfStructs[i]->wordOne);
+        printf(" %s\n",arrayOfStructs[i]->wordTwo);
+    }
+
+    //printf("The size of unique nodes are %d\n",sizeTracker);
 
    free(arrayOfStructs);
    cleanUpHashTable(hashTable,&size); //TURN THIS OFF WHEN I DO RESIZE!

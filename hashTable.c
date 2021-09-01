@@ -61,11 +61,11 @@ struct Node** growHashTable (struct Node** hashTable, int *size) {
     // Then free the other hashTable
     }
 
-    cleanUpHashTable(hashTable,&oldHashTableSize); // Might have to assign this to something this has to be empty
+    //cleanUpHashTable(hashTable,&oldHashTableSize); // Might have to assign this to something this has to be empty
     //hashTable = newHashTable;       ///////////////NOT SAVING THIS INSTANCE of the old hashTable
     //copyOldHashTableToNew(hashTable,newHashTable,size);
     // NEED TO COPY EVERYTHING AGAIN
-	   free(hashTable);
+	  // free(hashTable);
     //cleanUpHashTable(newHashTable,size);
     //free(newHashTable);
     return newHashTable;
@@ -153,7 +153,7 @@ int putAllStuctsIntoArray(struct Node **hashTable,int *sizeTracker,int *size,str
 
 
 
-int takeInPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeTracker) { // Make this a void star
+struct Node** takeInPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeTracker) { // Make this a void star
       char wordOneStatic[256];
       char wordTwoStatic[256];
       char combined[512];
@@ -181,7 +181,7 @@ int takeInPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeTracker) { 
         // If the hashTable is empty put in the node
         if (hashTable[bucket] == NULL) {
             struct Node* node = (struct Node*)calloc(1,sizeof(struct Node));
-            if(!node){fprintf(stderr,"Failed to allocate memory\n"); return 1;}
+            if(!node){fprintf(stderr,"Failed to allocate memory\n"); return NULL;}
             strcpy(node->wordOne, wordOneStatic);
             strcpy(node->wordTwo, wordTwoStatic);
             strcpy(node->combined, combined);
@@ -205,32 +205,35 @@ int takeInPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeTracker) { 
 
             // There is something in the bucket
             struct Node* cursor = hashTable[bucket];
-
-            if(strcmp(cursor->combined,combined) == 0) {
+            // If there is nothing connected to the node->next property
+            if(strcmp(cursor->combined,combined) == 0 && cursor->next == NULL) {
                 cursor->freq += 1; /////////////////////////ONE OFF ERROR
               //  printf("%s\n",cursor->combined);
               //  printf("%d\n",cursor->freq);
                 dubFlag = 1;
             }
-            while(cursor->next != NULL) {
-              if(strcmp(cursor->combined,combined) == 0) {
-                  cursor->freq += 1; /////////////////////////ONE OFF ERROR
-                  dubFlag = 1;
-                  break;
+            else {
+              while(cursor->next != NULL) {
+                if(strcmp(cursor->combined,combined) == 0) {
+                    cursor->freq += 1; /////////////////////////ONE OFF ERROR
+                    dubFlag = 1;
+                    break;
+                }
+                  //skipFlag = 1; // ALMOST HAVE INSERT WORKING START HERE!!!!
+                  cursor = cursor->next;
               }
-                cursor = cursor->next;
-            }
-
-            if(strcmp(cursor->combined,combined) == 0) {
-                cursor->freq += 1; /////////////////////////ONE OFF ERROR
-                dubFlag = 1;
-
+              // Cursor->next == NULL here
+              // Catch the last node in the linked list    // ALMOST HAVE INSERT WORKING START HERE!!!!
+              // if(cursor->next != NULL && strcmp(cursor->next->combined,combined) == 0) {
+              //     cursor->freq += 1; /////////////////////////ONE OFF ERROR
+              //     dubFlag = 1;
+              // }
             }
 
             if (dubFlag) {
               strcpy(wordOneStatic,wordTwoStatic);
               free(wordTwo);
-              memset(combined,'\0',sizeof(char)*100);
+              memset(combined,'\0',sizeof(char)*512);
               strcpy(wordOneStatic,wordTwoStatic);
               strcpy(combined,wordOneStatic);
               dubFlag = 0;
@@ -239,7 +242,7 @@ int takeInPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeTracker) { 
             // Better be no duplicates here....
 
             struct Node* node = (struct Node*)calloc(1,sizeof(struct Node));
-            if(!node){fprintf(stderr,"Failed to allocate memory\n"); return 1;}
+            if(!node){fprintf(stderr,"Failed to allocate memory\n");return NULL;}
             strcpy(node->wordOne, wordOneStatic);
             strcpy(node->wordTwo, wordTwoStatic);
             strcpy(node->combined, combined);
@@ -250,11 +253,11 @@ int takeInPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeTracker) { 
           //  printf("%s\n",cursor->combined);
             strcpy(wordOneStatic,wordTwoStatic);
             free(wordTwo);
-            memset(combined,'\0',sizeof(char)*100);
+            memset(combined,'\0',sizeof(char)*512);
             strcpy(wordOneStatic,wordTwoStatic);
             strcpy(combined,wordOneStatic);
             *sizeTracker += 1;
     }
-    return 0;
+    return hashTable;
 
 }

@@ -11,13 +11,13 @@ clean:
 	rm -f *.o
 
 bug: ${EXEC}
-	gdb -tui --args ./${EXEC} -4 test.txt
+	gdb -tui --args ./${EXEC} -4 mobydick.txt
 
 valgrind: ${EXEC}
-	valgrind --leak-check=full --track-origins=yes ./${EXEC} -4 test.txt
+	valgrind --leak-check=full --track-origins=yes ./${EXEC} -4 mobydick.txt
 
 run: ${EXEC}
-	./${EXEC} -4 test.txt
+	./${EXEC} -4 mobydick.txt
 
 ${EXEC}:${OBJS}
 	${CPP} ${FLAGS} -o ${EXEC} ${OBJS}
