@@ -82,7 +82,12 @@ int main(int argc, char *argv[]) {
       fclose(fp);
   }
     arrayOfStructs = (struct Node**)calloc(sizeTracker,sizeof(struct Node*));
-    if (!arrayOfStructs){ fprintf(stderr,"Failed to allocate memory\n"); exit(1);}
+    if (!arrayOfStructs){
+       fprintf(stderr,"Failed to allocate memory\n");
+       cleanUpHashTable(hashTable,&size); //TURN THIS OFF WHEN I DO RESIZE!
+       free(hashTable);
+       exit(1);
+     }
 
 
     putAllStuctsIntoArray(hashTable,&sizeTracker,&size,arrayOfStructs);

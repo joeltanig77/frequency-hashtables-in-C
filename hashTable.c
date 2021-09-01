@@ -35,6 +35,7 @@ int cleanUpHashTable(struct Node **hashTable, int *size) {
 
 
 int compareFreq(const void *compare1,const void *compare2) {
+    // Cast to double pointer than def ref twice to compare actual values
     struct Node **node1 = (struct Node **)compare1;
     struct Node **node2 = (struct Node **)compare2;
     return (*node1)->freq - (*node2)->freq;
