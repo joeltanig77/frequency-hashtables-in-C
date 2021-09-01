@@ -121,7 +121,7 @@ int reHashWalk (struct Node** newHashTable,struct Node* cursor, int *size) {
 
 
 
-int putAllStuctsIntoArray(struct Node **hashTable,int *sizeTracker,int *size,struct Node *arrayOfStructs[]) {
+int putAllStuctsIntoArray(struct Node **hashTable,int *sizeTracker,int *size,struct Node **arrayOfStructs) {
   int j = 0;
   int sizeOfItems = *size;
   for (int i = 0; i < sizeOfItems; i++) {
