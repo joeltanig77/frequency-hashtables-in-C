@@ -224,10 +224,10 @@ struct Node** takeInPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeT
               }
               // Cursor->next == NULL here
               // Catch the last node in the linked list    // ALMOST HAVE INSERT WORKING START HERE!!!!
-              // if(cursor->next != NULL && strcmp(cursor->next->combined,combined) == 0) {
-              //     cursor->freq += 1; /////////////////////////ONE OFF ERROR
-              //     dubFlag = 1;
-              // }
+              if(cursor->next == NULL && strcmp(cursor->combined,combined) == 0) {
+                  cursor->freq += 1; /////////////////////////ONE OFF ERROR
+                  dubFlag = 1;
+              }
             }
 
             if (dubFlag) {
