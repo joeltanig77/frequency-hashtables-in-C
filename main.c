@@ -32,19 +32,16 @@ int isThereANumber(char argv[]) {
   // We found a digit
   return 1;
 
-
 }
 
 int main(int argc, char *argv[]) {
    int linesToPrint = 0;
-   int size = 300;
+   int size = 1;
    int sizeTracker = 0;
    struct Node** arrayOfStructs = NULL;
    struct Node** hashTable = NULL;
    hashTable = (struct Node**)calloc(size,sizeof(struct Node*));
    if (!hashTable){ fprintf(stderr,"Failed to allocate memory\n"); exit(1);}
-
-
   int n = 1; // Arg counter that skips the pathway (pwd)
   FILE* fp2 = fopen(argv[n],"r");
   if(fp2 != NULL) {
@@ -60,7 +57,6 @@ int main(int argc, char *argv[]) {
     free(hashTable);
     exit(0);
   }
-
   else {
     n++; // Incrementing counter
     linesToPrint = atoi(argv[1])*-1; // Turn string into a integer
@@ -84,7 +80,7 @@ int main(int argc, char *argv[]) {
     arrayOfStructs = (struct Node**)calloc(sizeTracker,sizeof(struct Node*));
     if (!arrayOfStructs){
        fprintf(stderr,"Failed to allocate memory\n");
-       cleanUpHashTable(hashTable,&size); //TURN THIS OFF WHEN I DO RESIZE!
+       cleanUpHashTable(hashTable,&size,1); //TURN THIS OFF WHEN I DO RESIZE!
        free(hashTable);
        exit(1);
      }
@@ -92,19 +88,18 @@ int main(int argc, char *argv[]) {
 
     putAllStructsIntoArray(hashTable,&sizeTracker,&size,arrayOfStructs);
 
-
     qsort(arrayOfStructs,sizeTracker,sizeof(struct Node*),compareFreq);
 
     for(int i=0; i < sizeTracker; i++) {
         printf("%d",arrayOfStructs[i]->freq);
         printf(" %s\n",arrayOfStructs[i]->combined);
     }
-
     //printf("The size of unique nodes are %d\n",sizeTracker);
 
+   // Free before exit
    free(arrayOfStructs);
-   cleanUpHashTable(hashTable,&size); //TURN THIS OFF WHEN I DO RESIZE!
-   free(hashTable);                   //TURN THIS OFF WHEN I DO RESIZE!
+   cleanUpHashTable(hashTable,&size,1);
+   free(hashTable);
 
   return 0;
 }

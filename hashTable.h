@@ -23,7 +23,7 @@ struct Node** growHashTable(struct Node** hashTable, int *size);
 struct Node** insertIntoHashTable(struct Node **hashTable,int *size,int *sizeTracker,struct Node *node,char *combined);
 
 
-int cleanUpHashTable(struct Node **hashTable, int *size);
+int cleanUpHashTable(struct Node **hashTable, int *size,int lastIterationFlag);
 
 
 int reHashWalk(struct Node** newHashTable,struct Node* cursor, int *size);
@@ -33,7 +33,6 @@ int putAllStructsIntoArray(struct Node **hashTable, int *sizeTracker, int *size,
 
 
 int compareFreq(const void *compare1, const void *compare2);
-
 
 
 #endif
