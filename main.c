@@ -97,8 +97,7 @@ int main(int argc, char *argv[]) {
 
     for(int i=0; i < sizeTracker; i++) {
         printf("%d",arrayOfStructs[i]->freq);
-        printf(" %s",arrayOfStructs[i]->wordOne);
-        printf(" %s\n",arrayOfStructs[i]->wordTwo);
+        printf(" %s\n",arrayOfStructs[i]->combined);
     }
 
     //printf("The size of unique nodes are %d\n",sizeTracker);

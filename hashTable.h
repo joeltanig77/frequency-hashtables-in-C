@@ -5,9 +5,7 @@
 
 // Team anti-typedef lol
 struct Node {
-  char wordOne[256];
-  char wordTwo[256];
-  char combined[512];
+  char *combined;
   struct Node * next;
   int freq;
 };
@@ -22,7 +20,7 @@ struct Node** readWordPairs(FILE *fp, struct Node **hashTable,int *size,int *siz
 struct Node** growHashTable(struct Node** hashTable, int *size);
 
 
-struct Node** insertIntoHashTable(struct Node **hashTable,int *size,int *sizeTracker,struct Node *node,char combined[512]);
+struct Node** insertIntoHashTable(struct Node **hashTable,int *size,int *sizeTracker,struct Node *node,char *combined);
 
 
 int cleanUpHashTable(struct Node **hashTable, int *size);

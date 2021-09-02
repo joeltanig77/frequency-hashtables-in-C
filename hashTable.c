@@ -19,14 +19,18 @@ int cleanUpHashTable(struct Node **hashTable, int *size) {
           struct Node* cursor = hashTable[i];
           struct Node* temp = NULL;
           if(cursor->next == NULL) {
+              free(cursor->combined);
               free(cursor);
               continue;
           }
           while(cursor->next != NULL) {
               temp = cursor;
               cursor = cursor->next;
+              free(temp->combined);
               free(temp);
           }
+          // Free the last node
+          free(cursor->combined);
           free(cursor);
         }
     }
@@ -35,7 +39,7 @@ int cleanUpHashTable(struct Node **hashTable, int *size) {
 
 
 int compareFreq(const void *compare1,const void *compare2) {
-    // Cast to double pointer than def ref twice to compare actual values
+    // Cast to double pointer then defererence ref twice to compare actual values
     struct Node **node1 = (struct Node **)compare1;
     struct Node **node2 = (struct Node **)compare2;
     return (*node1)->freq - (*node2)->freq;
@@ -91,9 +95,7 @@ int reHashWalk (struct Node** newHashTable,struct Node* cursor, int *size) {
       // We know the newHashTable[newBucket] == NULL
           struct Node* node = (struct Node*)calloc(1,sizeof(struct Node));  // FREE THIS
           if(!node){fprintf(stderr,"Failed to allocate memory\n"); return 1;}
-          strcpy(node->wordOne,cursor->wordOne);
-          strcpy(node->wordTwo,cursor->wordTwo);
-          strcpy(node->combined,cursor->combined);
+          node->combined = cursor->combined;
           node->freq = cursor->freq;
           // The newHashTable[newBucket]->next == NULL is so insert
           newHashTableCursor->next = node;              /////////// Something wrong with the cursor as it == NULL still
@@ -102,9 +104,7 @@ int reHashWalk (struct Node** newHashTable,struct Node* cursor, int *size) {
     else {
       struct Node* node = (struct Node*)calloc(1,sizeof(struct Node));  // FREE THIS
       if(!node){fprintf(stderr,"Failed to allocate memory\n"); return 1;}
-      strcpy(node->wordOne,cursor->wordOne);
-      strcpy(node->wordTwo,cursor->wordTwo);
-      strcpy(node->combined,cursor->combined);
+      node->combined = cursor->combined;
       node->freq = cursor->freq;
       newHashTable[newBucket] = node;
     }
@@ -153,10 +153,9 @@ int putAllStructsIntoArray(struct Node **hashTable,int *sizeTracker,int *size,st
 }
 
 
-struct Node** insertIntoHashTable(struct Node **hashTable,int *size,int *sizeTracker,struct Node *node,char combined[512]) { // Make this a void star
+struct Node** insertIntoHashTable(struct Node **hashTable,int *size,int *sizeTracker,struct Node *node,char *combined) { // Make this a void star
       int bucket = crc64(combined) % *size;
-      int dubFlag = 0;
-      //DEBUG "To the"
+      int dupFlag = 0;
     if (hashTable[bucket] == NULL) {
         node->freq += 1;
         hashTable[bucket] = node;
@@ -168,31 +167,32 @@ struct Node** insertIntoHashTable(struct Node **hashTable,int *size,int *sizeTra
         struct Node* cursor = hashTable[bucket];
         printf("%s\n",cursor->combined);
         // If there is nothing connected to the node->next property
-        if(strcmp(cursor->combined,combined) == 0 && cursor->next == NULL) {
+        if((strcmp(cursor->combined,combined) == 0) && (cursor->next == NULL)) {
             cursor->freq += 1; /////////////////////////ONE OFF ERROR
             printf("%s\n",cursor->combined);
           //  printf("%d\n",cursor->freq);
-            dubFlag = 1;
+            dupFlag = 1;
         }
         else {
           while(cursor->next != NULL) {
             if(strcmp(cursor->combined,combined) == 0) {
-                cursor->freq += 1; /////////////////////////ONE OFF ERROR
-                dubFlag = 1;
+                cursor->freq += 1;
+                dupFlag = 1;
                 break;
             }
-              //skipFlag = 1; // ALMOST HAVE INSERT WORKING START HERE!!!!
+
               cursor = cursor->next;
           }
           // Cursor->next == NULL here
           // Catch the last node in the linked list    // ALMOST HAVE INSERT WORKING START HERE!!!!
           if(cursor->next == NULL && strcmp(cursor->combined,combined) == 0) {
               cursor->freq += 1; /////////////////////////ONE OFF ERROR
-              dubFlag = 1;
+              dupFlag = 1;
           }
         }
-        if (dubFlag) {
-          dubFlag = 0;
+        if(dupFlag) {
+          dupFlag = 0;
+          free(node->combined);
           free(node);
           return hashTable;
         }
@@ -205,41 +205,68 @@ struct Node** insertIntoHashTable(struct Node **hashTable,int *size,int *sizeTra
 
 
 
-struct Node** readWordPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeTracker) { // Make this a void star
-      char wordOneStatic[256];
-      char wordTwoStatic[256];
-      char combined[512];
+struct Node** readWordPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeTracker) { // Make this a void star, use strlen() add 1 for null term for stuff ig
+      int wordOneFlag = 1;
       char *wordOne = getNextWord(fp);
-      strcpy(wordOneStatic,wordOne);
-      strcpy(combined,wordOneStatic);
-      free(wordOne);
+      //free(wordOne);
       char *wordTwo = NULL;
+      char *temp = NULL;
       while((wordTwo = getNextWord(fp))!= NULL) {
           ///////////////////////////////////// TODO: START HERE
           // if (*sizeTracker == (*size/2)) {
           //   //  struct Node **hashTable;
           //     hashTable = growHashTable(hashTable,size);
           // }
-          strcpy(wordTwoStatic,wordTwo);
-          strcat(combined,wordTwoStatic);
+          if (wordOneFlag) {
+            int sizeOfStrings = strlen(wordOne) + strlen(wordTwo) + 2;
+            char *combined = calloc(sizeOfStrings,sizeof(char));
+            strcpy(combined,wordOne);
+            strcat(combined," ");
+            strcat(combined,wordTwo);
+            struct Node* node = (struct Node*)calloc(1,sizeof(struct Node));
+            if(!node){fprintf(stderr,"Failed to allocate memory\n");exit(0);}
+
+
+            node->combined = combined; // More pointers to free
+            // strcpy(node->wordOne, wordOneStatic);
+            // strcpy(node->wordTwo, wordTwoStatic);
+            // strcpy(node->combined, combined);
+            hashTable = insertIntoHashTable(hashTable,size,sizeTracker,node,combined);
+            wordOneFlag = 0;
+            free(wordOne);
+            temp = wordTwo;
+          }
+
+
+        else {
+          wordOne = temp;
+          int sizeOfStrings = strlen(wordOne) + strlen(wordTwo) + 2;
+          char *combined = calloc(sizeOfStrings,sizeof(char));
+          strcpy(combined,wordOne);
+          strcat(combined," ");
+          strcat(combined,wordTwo);
+          //strcat(combined,wordTwoStatic);
           struct Node* node = (struct Node*)calloc(1,sizeof(struct Node));
-          if(!node){fprintf(stderr,"Failed to allocate memory\n"); return NULL;}
-          strcpy(node->wordOne, wordOneStatic);
-          strcpy(node->wordTwo, wordTwoStatic);
-          strcpy(node->combined, combined);
+          if(!node){fprintf(stderr,"Failed to allocate memory\n");exit(0);}
+          node->combined = combined;
+          // strcpy(node->wordOne, wordOneStatic);
+          // strcpy(node->wordTwo, wordTwoStatic);
+          // strcpy(node->combined, combined);
           hashTable = insertIntoHashTable(hashTable,size,sizeTracker,node,combined);
+        //  free(combined);
 
-            printf("%s\n",wordOne);
+            //printf("%s\n",wordOne);
           //  printf("%s\n",wordTwo);
-            printf("%s\n",combined);
+            //printf("%s\n",combined);
         // If the hashTable is empty put in the node
-          strcpy(wordOneStatic,wordTwoStatic);
-          free(wordTwo);
-          memset(combined,'\0',sizeof(char)*512);
-          strcpy(wordOneStatic,wordTwoStatic);
-          strcpy(combined,wordOneStatic);
-
+          free(temp);
+          temp = wordTwo;
+          //free(combined);
+        }
+        //free(temp);
     }
+    //free(wordTwo);
+    free(temp);
+    //free(combined);
     return hashTable;
-
 }

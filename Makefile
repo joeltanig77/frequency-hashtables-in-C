@@ -14,7 +14,7 @@ bug: ${EXEC}
 	gdb -tui --args ./${EXEC} -4 dracula.txt
 
 valgrind: ${EXEC}
-	valgrind --leak-check=full --track-origins=yes ./${EXEC} -4 dracula.txt
+	valgrind -s --leak-check=full --track-origins=yes ./${EXEC} -4 dracula.txt
 
 run: ${EXEC}
 	./${EXEC} -4 dracula.txt
