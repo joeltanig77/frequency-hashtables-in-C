@@ -44,7 +44,7 @@ int compareFreq(const void *compare1,const void *compare2) {
     // Cast to double pointer then defererence twice to compare actual values
     struct Node **node1 = (struct Node **)compare1;
     struct Node **node2 = (struct Node **)compare2;
-    return (*node1)->freq - (*node2)->freq;
+    return (*node2)->freq - (*node1)->freq;
 }
 
 
@@ -137,8 +137,9 @@ int putAllStructsIntoArray(struct Node **hashTable,int *sizeTracker,int *size,st
 }
 
 
-struct Node** insertIntoHashTable(struct Node **hashTable,int *size,int *sizeTracker,struct Node *node,char *combined) { // Make this a void star
-      int bucket = crc64(combined) % *size;
+struct Node** insertIntoHashTable(struct Node **hashTable,int *size,int *sizeTracker,struct Node *node, void *combined) { // Make this a void star
+      char *combinedString = (char*)combined;
+      int bucket = crc64(combinedString) % *size;
       int dupFlag = 0;
     if (hashTable[bucket] == NULL) {
         node->freq += 1;
@@ -148,16 +149,14 @@ struct Node** insertIntoHashTable(struct Node **hashTable,int *size,int *sizeTra
     }
         // There is something in the bucket
         struct Node* cursor = hashTable[bucket];
-        printf("%s\n",cursor->combined);
         // If there is nothing connected to the node->next property
-        if((strcmp(cursor->combined,combined) == 0) && (cursor->next == NULL)) {
+        if((strcmp(cursor->combined,combinedString) == 0) && (cursor->next == NULL)) {
             cursor->freq += 1;
-            printf("%s\n",cursor->combined);
             dupFlag = 1;
         }
         else {
           while(cursor->next != NULL) {
-            if(strcmp(cursor->combined,combined) == 0) {
+            if(strcmp(cursor->combined,combinedString) == 0) {
                 cursor->freq += 1;
                 dupFlag = 1;
                 break;
@@ -166,7 +165,7 @@ struct Node** insertIntoHashTable(struct Node **hashTable,int *size,int *sizeTra
           }
           // Cursor->next == NULL here
           // Catch the last node in the linked list
-          if(cursor->next == NULL && strcmp(cursor->combined,combined) == 0) {
+          if(cursor->next == NULL && strcmp(cursor->combined,combinedString) == 0) {
               cursor->freq += 1;
               dupFlag = 1;
           }
@@ -185,7 +184,7 @@ struct Node** insertIntoHashTable(struct Node **hashTable,int *size,int *sizeTra
 }
 
 
-struct Node** readWordPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeTracker) { // Make this a void star, use strlen() add 1 for null term for stuff ig
+struct Node** readWordPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeTracker) {
       int wordOneFlag = 1;
       char *wordOne = getNextWord(fp);
       char *wordTwo = NULL;
@@ -196,7 +195,7 @@ struct Node** readWordPairs(FILE *fp, struct Node **hashTable,int *size,int *siz
           }
           if (wordOneFlag) {
             int sizeOfStrings = strlen(wordOne) + strlen(wordTwo) + 2;
-            char *combined = calloc(sizeOfStrings,sizeof(char));
+            void *combined = calloc(sizeOfStrings,sizeof(char));
             strcpy(combined,wordOne);
             strcat(combined," ");
             strcat(combined,wordTwo);
@@ -211,13 +210,13 @@ struct Node** readWordPairs(FILE *fp, struct Node **hashTable,int *size,int *siz
         else {
           wordOne = temp;
           int sizeOfStrings = strlen(wordOne) + strlen(wordTwo) + 2;
-          char *combined = calloc(sizeOfStrings,sizeof(char));
+          void *combined = calloc(sizeOfStrings,sizeof(char));
           strcpy(combined,wordOne);
           strcat(combined," ");
           strcat(combined,wordTwo);
           struct Node* node = (struct Node*)calloc(1,sizeof(struct Node));
           if(!node){fprintf(stderr,"Failed to allocate memory\n");exit(0);}
-          node->combined = combined;
+          node->combined = combined; // More pointers to free
           hashTable = insertIntoHashTable(hashTable,size,sizeTracker,node,combined);
           free(temp);
           temp = wordTwo;

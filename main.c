@@ -13,7 +13,7 @@ int isThereANumber(char argv[]) {
   int index = 0;
   // If - and not a digit eg. -e
   if((argv[0] == 45) && (!(isdigit(argv[1])))) {
-    return 4;
+    return 2;
   }
 
   if(argv[0] != 45) {
@@ -35,6 +35,12 @@ int isThereANumber(char argv[]) {
 }
 
 int main(int argc, char *argv[]) {
+    if (argc == 1) {
+      fprintf(stderr,"Error: no fileName arguments specified.\n\n");
+      fprintf(stderr,"\tUsage: ./wordpairs <-count> fileName1 <fileName2> ...\n\n");
+      fprintf(stderr,"\tWhere: count is the number of words to display\n\n");
+      exit(0);
+    }
    int linesToPrint = 0;
    int size = 1;
    int sizeTracker = 0;
@@ -50,17 +56,22 @@ int main(int argc, char *argv[]) {
   }
   // Have a line arg
   else if (isThereANumber(argv[1]) == 4){
+    fprintf(stderr,"Must assign - to count argument\n\n");
+    fprintf(stderr,"\tUsage ./wordpairs <-count> fileName1 <fileName2> ...\n\n");
+    fprintf(stderr,"\tWhere: count is the number of words to display\n\n");
     free(hashTable);
     exit(0);
   }
   else if (isThereANumber(argv[1]) == 2) {
+    fprintf(stderr,"Not a legal count argument\n\n");
+    fprintf(stderr,"\tUsage ./wordpairs <-count> fileName1 <fileName2> ...\n\n");
+    fprintf(stderr,"\tWhere: count is the number of words to display\n\n");
     free(hashTable);
     exit(0);
   }
   else {
     n++; // Incrementing counter
     linesToPrint = atoi(argv[1])*-1; // Turn string into a integer
-    printf("The argument number is %d\n",linesToPrint);
   }
   while (n < argc) {
     FILE* fp = fopen(argv[n],"r");
@@ -85,18 +96,24 @@ int main(int argc, char *argv[]) {
        exit(1);
      }
 
-
     putAllStructsIntoArray(hashTable,&sizeTracker,&size,arrayOfStructs);
 
     qsort(arrayOfStructs,sizeTracker,sizeof(struct Node*),compareFreq);
 
-    for(int i=0; i < sizeTracker; i++) {
-        printf("%d",arrayOfStructs[i]->freq);
-        printf(" %s\n",arrayOfStructs[i]->combined);
+    if(linesToPrint == -1) {
+      for(int i=0; i < sizeTracker; i++) {
+          printf("%10d",arrayOfStructs[i]->freq);
+          printf(" %s\n",(char*)arrayOfStructs[i]->combined);
+      }
     }
-    //printf("The size of unique nodes are %d\n",sizeTracker);
+    else {
+      for(int i=0; i < linesToPrint; i++) {
+          printf("%10d",arrayOfStructs[i]->freq);
+          printf(" %s\n",(char*)arrayOfStructs[i]->combined);
+      }
+    }
 
-   // Free before exit
+   // Freeing before exit
    free(arrayOfStructs);
    cleanUpHashTable(hashTable,&size,1);
    free(hashTable);
