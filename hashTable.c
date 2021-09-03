@@ -5,9 +5,6 @@
 #include "crc64.h"
 #include "hashTable.h"
 
-// Cursor assign temp to then free temp then continue walk
-// TODO 1: Need to do some UI stuff
-
 
 int cleanUpHashTable(struct Node **hashTable, int *size, int lastIterationFlag) {
     for (int i = 0; i < *size; i++) {
@@ -51,14 +48,24 @@ int compareFreq(const void *compare1,const void *compare2) {
 struct Node** growHashTable (struct Node** hashTable, int *size) {
     // Growing the hashTable by a factor of three
     int oldHashTableSize = *size;
-    // New size of the growing by a factor of theree
+    // New size of the growing by a factor of three
     *size = (*size*3);
     struct Node** newHashTable = NULL;
     newHashTable = (struct Node**)calloc(*size,sizeof(struct Node*));
-    if(!newHashTable){ fprintf(stderr,"Failed to allocate memory\n"); exit(1);}
+    if(!newHashTable){
+      cleanUpHashTable(hashTable,&oldHashTableSize,1);
+      free(hashTable);
+      fprintf(stderr,"Failed to allocate memory\n");
+      return NULL;
+    }
     for (int i = 0; i < oldHashTableSize; i++) {
       if (hashTable[i] != NULL) {
-          reHashWalk(newHashTable,hashTable[i],size);
+          int checkMem = reHashWalk(newHashTable,hashTable[i],size);
+          if (checkMem == -1) {
+            cleanUpHashTable(hashTable,&oldHashTableSize,1);
+            free(hashTable);
+            return NULL;
+          }
     }
 }
     cleanUpHashTable(hashTable,&oldHashTableSize,0);
@@ -82,16 +89,26 @@ int reHashWalk (struct Node** newHashTable,struct Node* cursor, int *size) {
       }
           // If there is something in the new Hashtable
           // We know the newHashTable[newBucket] == NULL
-          struct Node* node = (struct Node*)calloc(1,sizeof(struct Node));  // FREE THIS
-          if(!node){fprintf(stderr,"Failed to allocate memory\n"); return 1;}
+          struct Node* node = (struct Node*)calloc(1,sizeof(struct Node));
+          if(!node){
+            cleanUpHashTable(newHashTable,size,1);
+            free(newHashTable);
+            fprintf(stderr,"Failed to allocate memory\n");
+            exit(0);
+          }
           node->combined = cursor->combined;
           node->freq = cursor->freq;
           newHashTableCursor->next = node;
     }
     // Nothing in the new Hashtable bucket
     else {
-      struct Node* node = (struct Node*)calloc(1,sizeof(struct Node));  // FREE THIS
-      if(!node){fprintf(stderr,"Failed to allocate memory\n"); return 1;}
+      struct Node* node = (struct Node*)calloc(1,sizeof(struct Node));   // FREE THIS
+      if(!node){
+        cleanUpHashTable(newHashTable,size,1);
+        free(newHashTable);
+        fprintf(stderr,"Failed to allocate memory\n");
+        return -1;
+      }
       node->combined = cursor->combined;
       node->freq = cursor->freq;
       newHashTable[newBucket] = node;
@@ -105,7 +122,8 @@ int reHashWalk (struct Node** newHashTable,struct Node* cursor, int *size) {
 }
 
 
-int putAllStructsIntoArray(struct Node **hashTable,int *sizeTracker,int *size,struct Node **arrayOfStructs) {
+int putAllStructsIntoArray(struct Node **hashTable,int *sizeTracker,int *size,
+  struct Node **arrayOfStructs) {
   int j = 0;
   int sizeOfItems = *size;
   for (int i = 0; i < sizeOfItems; i++) {
@@ -137,7 +155,8 @@ int putAllStructsIntoArray(struct Node **hashTable,int *sizeTracker,int *size,st
 }
 
 
-struct Node** insertIntoHashTable(struct Node **hashTable,int *size,int *sizeTracker,struct Node *node, void *combined) { // Make this a void star
+struct Node** insertIntoHashTable(struct Node **hashTable,int *size,int *sizeTracker,
+  struct Node *node, void *combined) {
       char *combinedString = (char*)combined;
       int bucket = crc64(combinedString) % *size;
       int dupFlag = 0;
@@ -165,7 +184,8 @@ struct Node** insertIntoHashTable(struct Node **hashTable,int *size,int *sizeTra
           }
           // Cursor->next == NULL here
           // Catch the last node in the linked list
-          if(cursor->next == NULL && strcmp(cursor->combined,combinedString) == 0) {
+          if(cursor->next == NULL &&
+            strcmp(cursor->combined,combinedString) == 0) {
               cursor->freq += 1;
               dupFlag = 1;
           }
@@ -184,7 +204,8 @@ struct Node** insertIntoHashTable(struct Node **hashTable,int *size,int *sizeTra
 }
 
 
-struct Node** readWordPairs(FILE *fp, struct Node **hashTable,int *size,int *sizeTracker) {
+struct Node** readWordPairs(FILE *fp, struct Node **hashTable, int *size,
+  int *sizeTracker) {
       int wordOneFlag = 1;
       char *wordOne = getNextWord(fp);
       char *wordTwo = NULL;
@@ -192,17 +213,43 @@ struct Node** readWordPairs(FILE *fp, struct Node **hashTable,int *size,int *siz
       while((wordTwo = getNextWord(fp))!= NULL) {
           if (*sizeTracker == (*size/2)) {
               hashTable = growHashTable(hashTable,size);
+              if(!hashTable) {
+                free(wordTwo);
+                free(hashTable);
+                free(temp);
+                return NULL;
+              }
           }
           if (wordOneFlag) {
             int sizeOfStrings = strlen(wordOne) + strlen(wordTwo) + 2;
             void *combined = calloc(sizeOfStrings,sizeof(char));
+            if (!combined) {
+              cleanUpHashTable(hashTable,size,1);
+              free(wordOne);
+              free(wordTwo);
+              free(hashTable);
+              free(temp);
+              fprintf(stderr,"Failed to allocate memory\n");
+              return NULL;
+            }
             strcpy(combined,wordOne);
             strcat(combined," ");
             strcat(combined,wordTwo);
             struct Node* node = (struct Node*)calloc(1,sizeof(struct Node));
-            if(!node){fprintf(stderr,"Failed to allocate memory\n");exit(0);}
+            if(!node) {
+              cleanUpHashTable(hashTable,size,1);
+              free(wordOne);
+              free(wordTwo);
+              free(hashTable);
+              free(node);
+              free(combined);
+              free(temp);
+              fprintf(stderr,"Failed to allocate memory\n");
+              return NULL;
+            }
             node->combined = combined; // More pointers to free
-            hashTable = insertIntoHashTable(hashTable,size,sizeTracker,node,combined);
+            hashTable = insertIntoHashTable(hashTable,size,sizeTracker,node,
+              combined);
             wordOneFlag = 0;
             free(wordOne);
             temp = wordTwo;
@@ -211,11 +258,28 @@ struct Node** readWordPairs(FILE *fp, struct Node **hashTable,int *size,int *siz
           wordOne = temp;
           int sizeOfStrings = strlen(wordOne) + strlen(wordTwo) + 2;
           void *combined = calloc(sizeOfStrings,sizeof(char));
+          if (!combined) {
+            cleanUpHashTable(hashTable,size,1);
+            free(wordTwo);
+            free(hashTable);
+            free(temp);
+            fprintf(stderr,"Failed to allocate memory\n");
+            return NULL;
+          }
           strcpy(combined,wordOne);
           strcat(combined," ");
           strcat(combined,wordTwo);
           struct Node* node = (struct Node*)calloc(1,sizeof(struct Node));
-          if(!node){fprintf(stderr,"Failed to allocate memory\n");exit(0);}
+          if(!node) {
+            cleanUpHashTable(hashTable,size,1);
+            free(wordTwo);
+            free(hashTable);
+            free(node);
+            free(combined);
+            free(temp);
+            fprintf(stderr,"Failed to allocate memory\n");
+            return NULL;
+          }
           node->combined = combined; // More pointers to free
           hashTable = insertIntoHashTable(hashTable,size,sizeTracker,node,combined);
           free(temp);
