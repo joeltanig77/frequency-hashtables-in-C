@@ -12,20 +12,13 @@ struct Node {
 
 /* Note: All sizes being passed in must be an address */
 
-/*
-  A function that takes in a file pointer, a hashTable and the initial size of
-  the hashTable and inserts the word pairs of a text file
-*/
-
-struct Node** readWordPairs(FILE *fp, struct Node **hashTable,
-   int *size, int *sizeTracker);
 
 /*
   A function that takes in a hashTable and the size of the hashTable,
   the function returns a newHashTable that grows by a factor of three
 */
 
-struct Node** growHashTable(struct Node** hashTable, int *size);
+struct Node** growHashTable(struct Node** hashTable, int *size, int *memChecker);
 
 /*
  A function that takes in a hashTable the size of the hashTable, the
@@ -37,7 +30,7 @@ struct Node** growHashTable(struct Node** hashTable, int *size);
 */
 
 struct Node** insertIntoHashTable(struct Node **hashTable, int *size,
-   int *sizeTracker, void *combined);
+   int *sizeTracker, void *combined, int *memChecker);
 
 /*
   A function that takes in the hashTable, the size of the hashTable, and a flag
@@ -54,21 +47,6 @@ int cleanUpHashTable(struct Node **hashTable, int *size, int lastIterationFlag);
 */
 
 int reHashWalk(struct Node** newHashTable, struct Node* cursor, int *size);
-
-/*
-  A function that takes in a hashTable, the items inserted into the hashTable,
-  the size of the hashTable, and a array of pointers to be used for insertion
-*/
-
-int putAllStructsIntoArray(struct Node **hashTable, int *sizeTracker,
-   int *size, struct Node **arrayOfStructs);
-
-/*
-  A function thats takes in void pointer 1 and void pointer 2 that that is
-  used for qsorting frequency's
-*/
-
-int compareFreq(const void *compare1, const void *compare2);
 
 
 #endif

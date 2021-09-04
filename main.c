@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "getWord.h"
 #include "crc64.h"
 #include "hashTable.h"
-#include <ctype.h>
+#include "readWordPairs.h"
+#include "sortHashTable.h"
 
 
 int isThereANumber(char argv[]) {
@@ -39,11 +41,13 @@ int main(int argc, char *argv[]) {
       exit(0);
     }
    int linesToPrint = 0;
+   int memChecker = 0;
    // The size of the hashTable starts at 10
    int size = 10;
    int sizeTracker = 0;
    struct Node** arrayOfStructs = NULL;
    struct Node** hashTable = NULL;
+   struct Node** freeOldHashTable = NULL;
    hashTable = (struct Node**)calloc(size,sizeof(struct Node*));
    if (!hashTable){
       fprintf(stderr,"Failed to allocate memory\n");
@@ -95,9 +99,31 @@ int main(int argc, char *argv[]) {
       n++;
 
       // Insert file pointer to insert to hashtable
-      hashTable = readWordPairs(fp,hashTable,&size,&sizeTracker);
-      if(!hashTable) {
+      freeOldHashTable = hashTable;
+      hashTable = readWordPairs(fp,hashTable,&size,&sizeTracker,&memChecker);
+      // If something failed to allocate memory, clean up and exit
+      if (memChecker == 1){
+        cleanUpHashTable(freeOldHashTable,&size,1);
         free(hashTable);
+        free(freeOldHashTable);
+        fclose(fp);
+        exit(0);
+      }
+      if (memChecker == 2) {
+        fclose(fp);
+        exit(0);
+      }
+      if (memChecker == 3) {
+        free(hashTable);
+        fclose(fp);
+        exit(0);
+      }
+      if (memChecker == 4) {
+        fclose(fp);
+        exit(0);
+      }
+      if(!hashTable) {
+        free(freeOldHashTable);
         fclose(fp);
         exit(0);
       }
@@ -129,7 +155,6 @@ int main(int argc, char *argv[]) {
           printf(" %s\n",(char*)arrayOfStructs[i]->combined);
       }
     }
-
    // Freeing before exit
    free(arrayOfStructs);
    cleanUpHashTable(hashTable,&size,1);
