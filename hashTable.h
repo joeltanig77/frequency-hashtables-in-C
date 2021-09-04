@@ -37,7 +37,7 @@ struct Node** growHashTable(struct Node** hashTable, int *size);
 */
 
 struct Node** insertIntoHashTable(struct Node **hashTable, int *size,
-   int *sizeTracker, struct Node *node, void *combined);
+   int *sizeTracker, void *combined);
 
 /*
   A function that takes in the hashTable, the size of the hashTable, and a flag

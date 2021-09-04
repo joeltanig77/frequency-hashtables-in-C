@@ -47,7 +47,6 @@ int main(int argc, char *argv[]) {
    hashTable = (struct Node**)calloc(size,sizeof(struct Node*));
    if (!hashTable){
       fprintf(stderr,"Failed to allocate memory\n");
-      free(hashTable);
       exit(0);
   }
    int n = 1; // Arg counter that skips the pathway (pwd)
@@ -86,8 +85,9 @@ int main(int argc, char *argv[]) {
   while (n < argc) {
     FILE* fp = fopen(argv[n],"r");
     if(fp == NULL) {
+      cleanUpHashTable(hashTable,&size,1);
       free(hashTable);
-      fprintf(stderr,"Can't open file, please check file privleges\n");
+      fprintf(stderr,"Can't open file, please check file privleges\n\n");
       fprintf(stderr,"\tUsage ./wordpairs <-count> fileName1 <fileName2> ...\n\n");
       fprintf(stderr,"\tWhere: count is the number of words to display\n\n");
       exit(0);
@@ -134,5 +134,5 @@ int main(int argc, char *argv[]) {
    free(arrayOfStructs);
    cleanUpHashTable(hashTable,&size,1);
    free(hashTable);
-  return 0;
+   return 0;
 }
