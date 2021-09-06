@@ -17,9 +17,10 @@ int compareFreq(const void *compare1,const void *compare2) {
 
 int putAllStructsIntoArray(struct Node **hashTable,int *sizeTracker,int *size,
   struct Node **arrayOfStructs) {
+  // j is the last knows empty cursor for the arrayOfStructs
   int j = 0;
   int sizeOfItems = *size;
-  for (int i = 0; i < sizeOfItems; i++) {
+  for(int i = 0; i < sizeOfItems; i++) {
       // Iterate the array of linked lists
       if(hashTable[i] != NULL) {
         struct Node* cursor = hashTable[i];

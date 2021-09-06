@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "getWord.h"
 #include "crc64.h"
 #include "hashTable.h"
 
@@ -13,6 +12,7 @@ int cleanUpHashTable(struct Node **hashTable, int *size, int lastIterationFlag) 
           struct Node* temp = NULL;
           if(cursor->next == NULL) {
             if(lastIterationFlag) {
+              // Free the cursor->combined for exit
               free(cursor->combined);
             }
               free(cursor);
@@ -22,6 +22,7 @@ int cleanUpHashTable(struct Node **hashTable, int *size, int lastIterationFlag) 
               temp = cursor;
               cursor = cursor->next;
               if(lastIterationFlag) {
+                // Free the cursor->combined for exit
                 free(temp->combined);
               }
               free(temp);
@@ -47,15 +48,16 @@ struct Node** growHashTable (struct Node** hashTable, int *size, int *memChecker
     struct Node** newHashTable = NULL;
     newHashTable = (struct Node**)calloc(*size,sizeof(struct Node*));  //DONE
     if(!newHashTable){
-      *memChecker = 3;
+      *memChecker = 5;
       cleanUpHashTable(hashTable,&oldHashTableSize,1);
       fprintf(stderr,"Failed to allocate memory\n");
       return NULL;
     }
-    for (int i = 0; i < oldHashTableSize; i++) {
-      if (hashTable[i] != NULL) {
+    // Walk the old hashtable giving the location of a potential start of the linked list
+    for(int i = 0; i < oldHashTableSize; i++) {
+      if(hashTable[i] != NULL) {
           int checkMem = reHashWalk(newHashTable,hashTable[i],size); //DONE
-          if (checkMem == -1) {
+          if(checkMem == -1) {
             *memChecker = 3;
             cleanUpHashTable(hashTable,&oldHashTableSize,1);
             free(hashTable);
@@ -68,12 +70,12 @@ struct Node** growHashTable (struct Node** hashTable, int *size, int *memChecker
     cleanUpHashTable(hashTable,&oldHashTableSize,0);
     free(hashTable);
     return newHashTable;
-  }
+}
 
 
 int reHashWalk (struct Node** newHashTable,struct Node* cursor, int *size) {
     int memCheck = 0;
-    if (cursor == NULL) {
+    if(cursor == NULL) {
       return 0;
     }
     // Rehash method here
@@ -122,16 +124,17 @@ int reHashWalk (struct Node** newHashTable,struct Node* cursor, int *size) {
 
 struct Node** insertIntoHashTable(struct Node **hashTable,int *size,
   int *sizeTracker, void *combined, int *memChecker) {
+      // Hash method
       int bucket = crc64((char*)combined) % *size;
       int dupFlag = 0;
-    if (hashTable[bucket] == NULL) {
+    if(hashTable[bucket] == NULL) {
       struct Node* node = (struct Node*)calloc(1,sizeof(struct Node));  //DONE
       if(!node) {
         return NULL;
       }
         node->freq += 1;
         hashTable[bucket] = node;
-        node->combined = combined; // More pointers to free
+        node->combined = combined;
         *sizeTracker += 1;
         return hashTable;
     }
@@ -161,6 +164,7 @@ struct Node** insertIntoHashTable(struct Node **hashTable,int *size,
           }
         }
         if(dupFlag) {
+          // We have a duplicate here
           free(combined);
           dupFlag = 0;
           return hashTable;
@@ -173,9 +177,10 @@ struct Node** insertIntoHashTable(struct Node **hashTable,int *size,
           free(hashTable);
           return NULL;
         }
+        // Attach the node with no duplicates
         node->freq += 1;
         cursor->next = node;
-        node->combined = combined; // More pointers to free
+        node->combined = combined;
         *sizeTracker += 1;
         return hashTable;
 }

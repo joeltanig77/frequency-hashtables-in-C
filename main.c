@@ -34,22 +34,25 @@ int isThereANumber(char argv[]) {
 }
 
 int main(int argc, char *argv[]) {
-    if (argc == 1) {
+    if(argc == 1) {
       fprintf(stderr,"Error: no fileName arguments specified.\n\n");
       fprintf(stderr,"\tUsage: ./wordpairs <-count> fileName1 <fileName2> ...\n\n");
       fprintf(stderr,"\tWhere: count is the number of words to display\n\n");
       exit(0);
     }
+   // Save the optional first argument
    int linesToPrint = 0;
+   // A flag for if calloc fails, it shows a code for what to clean up
    int memChecker = 0;
    // The size of the hashTable starts at 10
    int size = 10;
+   // This keeps track of how many items in the hashTable
    int sizeTracker = 0;
    struct Node** arrayOfStructs = NULL;
    struct Node** hashTable = NULL;
    struct Node** freeOldHashTable = NULL;
-   hashTable = (struct Node**)calloc(size,sizeof(struct Node*));
-   if (!hashTable){
+   hashTable = (struct Node**)calloc(size,sizeof(struct Node*)); //DONE
+   if(!hashTable){
       fprintf(stderr,"Failed to allocate memory\n");
       exit(0);
   }
@@ -68,14 +71,14 @@ int main(int argc, char *argv[]) {
      fclose(fp2);
    }
   // Have a line arg
-  else if (isThereANumber(argv[1]) == 4) {
+  else if(isThereANumber(argv[1]) == 4) {
     fprintf(stderr,"Must assign - to count argument\n\n");
     fprintf(stderr,"\tUsage ./wordpairs <-count> fileName1 <fileName2> ...\n\n");
     fprintf(stderr,"\tWhere: count is the number of words to display\n\n");
     free(hashTable);
     exit(0);
   }
-  else if (isThereANumber(argv[1]) == 2) {
+  else if(isThereANumber(argv[1]) == 2) {
     fprintf(stderr,"Not a legal count argument\n\n");
     fprintf(stderr,"\tUsage ./wordpairs <-count> fileName1 <fileName2> ...\n\n");
     fprintf(stderr,"\tWhere: count is the number of words to display\n\n");
@@ -102,23 +105,25 @@ int main(int argc, char *argv[]) {
       freeOldHashTable = hashTable;
       hashTable = readWordPairs(fp,hashTable,&size,&sizeTracker,&memChecker);
       // If something failed to allocate memory, clean up and exit
-      if (memChecker == 1){
+      if(memChecker == 1) {
         cleanUpHashTable(freeOldHashTable,&size,1);
         free(hashTable);
         free(freeOldHashTable);
         fclose(fp);
         exit(0);
       }
-      if (memChecker == 2) {
+      if(memChecker == 2 || memChecker == 4) {
         fclose(fp);
         exit(0);
       }
-      if (memChecker == 3) {
+      if(memChecker == 3) {
         free(hashTable);
         fclose(fp);
         exit(0);
       }
-      if (memChecker == 4) {
+      if(memChecker == 5) {
+        free(freeOldHashTable);
+        free(hashTable);
         fclose(fp);
         exit(0);
       }
@@ -132,7 +137,7 @@ int main(int argc, char *argv[]) {
   }
 
     arrayOfStructs = (struct Node**)calloc(sizeTracker,sizeof(struct Node*));
-    if (!arrayOfStructs){
+    if(!arrayOfStructs) {
        fprintf(stderr,"Failed to allocate memory\n");
        cleanUpHashTable(hashTable,&size,1); //TURN THIS OFF WHEN I DO RESIZE!
        free(hashTable);
@@ -150,9 +155,19 @@ int main(int argc, char *argv[]) {
       }
     }
     else {
-      for(int i=0; i < linesToPrint; i++) {
+      // If the wordPairs in the hashtable is less than the
+      // requested linesToPrint - option then just print all of the wordPairs
+      if(sizeTracker < linesToPrint) {
+        for(int i=0;i < sizeTracker; i++) {
           printf("%10d",arrayOfStructs[i]->freq);
           printf(" %s\n",(char*)arrayOfStructs[i]->combined);
+        }
+      }
+      else {
+        for(int i=0; i < linesToPrint; i++) {
+            printf("%10d",arrayOfStructs[i]->freq);
+            printf(" %s\n",(char*)arrayOfStructs[i]->combined);
+        }
       }
     }
    // Freeing before exit

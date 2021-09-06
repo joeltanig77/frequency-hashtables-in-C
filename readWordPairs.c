@@ -4,19 +4,20 @@
 #include "getWord.h"
 #include "hashTable.h"
 #include "readWordPairs.h"
-#include "sortHashTable.h"
 
 
 struct Node** readWordPairs(FILE *fp, struct Node **hashTable, int *size,
   int *sizeTracker, int *memChecker) {
       int wordOneFlag = 1;
+      int oneWordInTextFile = 1;
       char *wordOne = getNextWord(fp);
       char *wordTwo = NULL;
       char *temp = NULL;
       while((wordTwo = getNextWord(fp))!= NULL) {
+          oneWordInTextFile = 0;
           // Resize test,
-          // if the items of the hashtable is half my hashtable size
-          if (*sizeTracker == (*size/2)) {
+          // If the items of the hashtable is half my hashtable size
+          if(*sizeTracker == (*size/2)) {
               hashTable = growHashTable(hashTable,size,memChecker);
               if(!hashTable) {
                 free(wordTwo);
@@ -25,10 +26,10 @@ struct Node** readWordPairs(FILE *fp, struct Node **hashTable, int *size,
                 return NULL;
               }
           }
-          if (wordOneFlag) {
+          if(wordOneFlag) {
             int sizeOfStrings = strlen(wordOne) + strlen(wordTwo) + 2;
             void *combined = (void*)calloc(sizeOfStrings,sizeof(char)); //DONE
-            if (!combined) {
+            if(!combined) {
               *memChecker = 2;
               cleanUpHashTable(hashTable,size,1);
               free(wordOne);
@@ -43,7 +44,7 @@ struct Node** readWordPairs(FILE *fp, struct Node **hashTable, int *size,
             strcat(combined,wordTwo);
             hashTable = insertIntoHashTable(hashTable,size,sizeTracker,
               combined,memChecker);  //DONE
-            if (!hashTable) {
+            if(!hashTable) {
               free(wordOne);
               free(wordTwo);
               free(hashTable);
@@ -60,7 +61,7 @@ struct Node** readWordPairs(FILE *fp, struct Node **hashTable, int *size,
           wordOne = temp;
           int sizeOfStrings = strlen(wordOne) + strlen(wordTwo) + 2;
           void *combined = (void*)calloc(sizeOfStrings,sizeof(char)); //DONE
-          if (!combined) {
+          if(!combined) {
             *memChecker = 2;
             cleanUpHashTable(hashTable,size,1);
             free(wordTwo);
@@ -74,7 +75,7 @@ struct Node** readWordPairs(FILE *fp, struct Node **hashTable, int *size,
           strcat(combined,wordTwo);
           hashTable = insertIntoHashTable(hashTable,size,sizeTracker,
             combined,memChecker); //DONE
-          if (!hashTable) {
+          if(!hashTable) {
             if(*memChecker != 4){
               *memChecker = 1;
             }
@@ -89,6 +90,8 @@ struct Node** readWordPairs(FILE *fp, struct Node **hashTable, int *size,
           temp = wordTwo;
         }
     }
+    // Edge case for if its a one word
+    if(oneWordInTextFile) free(wordOne);
     free(temp);
     return hashTable;
 }

@@ -11,13 +11,13 @@ clean:
 	rm -f *.o
 
 bug: ${EXEC}
-	gdb -tui --args ./${EXEC} -10 dracula.txt dracula.txt dracula.txt dracula.txt dracula.txt dracula.txt
+	gdb -tui --args ./${EXEC} -10 dracula.txt dracula.txt
 
 valgrind: ${EXEC}
-	valgrind -s --leak-check=full --track-origins=yes ./${EXEC} -10 dracula.txt dracula.txt dracula.txt dracula.txt dracula.txt dracula.txt
+	valgrind -s --leak-check=full --track-origins=yes ./${EXEC} -10 dracula.txt dracula.txt
 
 run: ${EXEC}
-	./${EXEC} -10 dracula.txt dracula.txt dracula.txt dracula.txt dracula.txt dracula.txt
+	./${EXEC} -10 dracula.txt dracula.txt
 
 ${EXEC}:${OBJS}
 	${CPP} ${FLAGS} -o ${EXEC} ${OBJS}
